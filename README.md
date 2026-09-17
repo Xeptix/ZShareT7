@@ -96,9 +96,13 @@ installer/linux/install.sh
 
 Each one finds your Black Ops III folder and installs for every client you have —
 **BOIII**, **Ezz BOIII** and **T7x** — skipping any that aren't there, so it never makes a
-folder for a client you don't use. It shows you what it is about to copy and asks once.
+folder for a client you don't use. Keep a copy of the game folder for each client —
+`Call of Duty Black Ops III EzzBOIII` beside `Call of Duty Black Ops III` — and a copy with
+a client folder of its own is installed to as well. It shows you what it is about to copy
+and asks once.
 `install.bat -Yes` and `install.sh --yes` copy without asking, `-Uninstall` / `--uninstall`
-removes what an install put there, and `-Find` / `--find` only shows what it detects.
+removes what an install put there, and `-Find` / `--find` only shows what it detects. When it
+can't find your game, `-To <folder>` / `--to <folder>` points it there.
 
 You don't need to restart the game to load a script — just end the current game and start
 a new one.
@@ -370,6 +374,18 @@ folders, Black Ops 4's mod folder — with one installer that asks which of them
 ---
 
 ## Changelog
+
+### v1.1
+
+- **Paying at a perk machine or the Pack-a-Punch works.** Crouched at either, the machine's
+  own prompt was the one on screen, so the press bought the perk rather than paying for a
+  teammate. ZShare's prompt shows now, for the player it is meant for, and the machine's
+  comes back the moment they stand up.
+- **Paying for a perk works on maps that power their machines their own way.** A custom map
+  whose power doesn't go through the stock perk power script never offered the pay prompt.
+- **A trade of two identical guns is refused** — "You already have that weapon" — the way
+  Black Ops II has always refused it. Only the same gun both ways; a plain gun for its
+  Pack-a-Punched version still trades.
 
 ### v1.0
 

@@ -1,6 +1,6 @@
 /*
 ======================================================================
-    ZSHARE T7 v1.0  --  Weapon sharing for Black Ops III Zombies
+    ZSHARE T7 v1.1  --  Weapon sharing for Black Ops III Zombies
 
     by Xep
 
@@ -970,6 +970,15 @@ zs_trade_do( a, b )
     if ( why != "" )
     {
         b zs_deny( why );
+        return;
+    }
+
+    // The same gun both ways would trade nothing, and Black Ops II refuses
+    // it before anything else. zs_carries_same_family() lets the outgoing
+    // gun through on purpose, so it never catches this one.
+    if ( a_weapon == b_weapon )
+    {
+        b zs_deny( "MSG_ALREADY_HAVE" );
         return;
     }
 
@@ -2637,8 +2646,14 @@ zs_perk_pay_ok( player )
     if ( !level.zs.perk_pay || !zs_pay_team_check() )
         return 0;
 
-    // An unpowered machine sells nothing, so there is nothing to pay for.
-    if ( !zs_true( self.power_on ) )
+    /*
+        An unpowered machine sells nothing, so there is nothing to pay for.
+        Only a machine known to be off, though: power_on is written by
+        perk_machine_think() alone, and a map that powers its machines
+        through a power override thread never writes it at all -- read as
+        "off", no machine on that map would ever offer to be paid for.
+    */
+    if ( isdefined( self.power_on ) && !self.power_on )
         return 0;
 
     if ( !isdefined( self.zs_cost ) || self.zs_cost <= 0 )
@@ -2949,6 +2964,34 @@ zs_machine_update( t )
     }
 
     zs_trigger_show( t, best, want );
+
+    if ( isdefined( best ) )
+        best zs_machine_prompt_hold();
+}
+
+/*
+    Take the machine's own prompt away from the one player ZShare's prompt
+    is showing to, so the engine has only ours to draw.
+
+    Both prompts sit on the machine, and the engine draws whichever it
+    likes -- in play it drew the perk machine's, every time. The machine's
+    visibility loop, which cannot be stopped or replaced, hides its prompt
+    from a player standing in a revive trigger: check_player_has_perk()
+    through vending_trigger_can_player_use(), and the Pack-a-Punch's
+    through zm_magicbox::can_buy_weapon(). in_revive_trigger() keeps its
+    answer on the player for 100ms, in rt_time and in_rt_cached, and this
+    runs every 50ms, so for as long as ZShare's prompt is up the answer is
+    yes. The moment it is not, the cache runs out and is worked out afresh
+    within a tenth of a second.
+
+    Everything that reads in_revive_trigger() refuses a purchase or a use
+    while it is true, which is what a crouched press here means anyway: it
+    is ZShare's, not the machine's.
+*/
+zs_machine_prompt_hold()
+{
+    self.rt_time = gettime();
+    self.in_rt_cached = 1;
 }
 
 
