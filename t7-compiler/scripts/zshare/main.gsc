@@ -1,6 +1,6 @@
 /*
 ======================================================================
-    ZSHARE T7 v1.1  --  Weapon sharing for Black Ops III Zombies
+    ZSHARE T7 v1.2  --  Weapon sharing for Black Ops III Zombies
 
     by Xep
 
@@ -91,7 +91,6 @@
 #include scripts\shared\util_shared;
 #include scripts\zm\_zm_equipment;
 #include scripts\zm\_zm_magicbox;
-#include scripts\zm\_zm_pack_a_punch;
 #include scripts\zm\_zm_pack_a_punch_util;
 #include scripts\zm\_zm_perks;
 #include scripts\zm\_zm_score;

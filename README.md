@@ -375,6 +375,12 @@ folders, Black Ops 4's mod folder — with one installer that asks which of them
 
 ## Changelog
 
+### v1.2
+
+- **Nacht der Untoten, Verruckt and Shi No Numa load with the Workshop mod.** ZShare no
+  longer forces the Pack-a-Punch system to load on maps which do not have the machine,
+  keeping their original clientfield registration tables unchanged.
+
 ### v1.1
 
 - **Paying at a perk machine or the Pack-a-Punch works.** Crouched at either, the machine's
