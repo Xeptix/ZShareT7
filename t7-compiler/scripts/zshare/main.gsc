@@ -1,6 +1,6 @@
 /*
 ======================================================================
-    ZSHARE T7 v1.2  --  Weapon sharing for Black Ops III Zombies
+    ZSHARE T7 v1.3  --  Weapon sharing for Black Ops III Zombies
 
     by Xep
 
@@ -131,6 +131,20 @@ __init__()
         return;
 
     callback::on_start_gametype( ::init );
+
+    /*
+        The player callbacks are the other half of what installs ZShare,
+        and they are registered before init() has read anything, so they
+        get the switch read straight -- the way zs_origin_allowed() reads
+        its two. One nobody has set comes back "", which is on.
+
+        on_start_gametype stays registered either way: init() is what
+        puts the descriptor on level.zmods, saying enabled 0, and "not
+        installed" and "installed and switched off" are different answers.
+    */
+    if ( getdvarstring( "zs_enabled" ) == "0" )
+        return;
+
     callback::on_connect( ::zs_on_connect );
     callback::on_spawned( ::zs_on_spawned );
 }
@@ -208,6 +222,17 @@ init()
 
     level.zs_loaded = 1;
 
+    /*
+        Switched off. The descriptor still goes up, because "not
+        installed" and "installed and switched off" are different answers
+        to a mod asking what ZShare is doing in this match.
+    */
+    if ( !level.zs.enabled )
+    {
+        zs_api_register( 0 );
+        return;
+    }
+
     level.zs_triggers = [];
     level.zs_machine_triggers = [];
 
@@ -220,6 +245,10 @@ init()
     level thread zs_config_watcher();
     level thread zs_config_printer();
     level thread zs_build_watermark();
+
+    // Last, so the first thing that reads it finds a mod already up.
+    zs_api_register( 1 );
+
 }
 
 zs_on_connect()
@@ -262,6 +291,21 @@ zs_load_config()
 {
     if ( !isdefined( level.zs ) )
         level.zs = spawnstruct();
+
+    // --- general ---------------------------------------------------
+
+    /*
+        ZShare itself. On by default. Off, the script still loads, still
+        says so on level.zmods -- with enabled 0 -- and does nothing else:
+        no prompts, no hooks over the stock scripts, no chat words and no
+        threads. The match runs as it would with the file gone.
+
+        Read once, as the match loads. Taking prompts off players and
+        handing replaced stock functions back is not something a switch
+        can do safely in the middle of a game, so this one lands on the
+        next match -- which is what a bundle's MODS page says about it.
+    */
+    level.zs.enabled = zs_cfg_int( "zs_enabled", 1 );
 
     // --- origin ----------------------------------------------------
 
@@ -491,10 +535,42 @@ zs_payer_ok( player )
     if ( !zs_player_ok( player ) )
         return 0;
 
-    if ( zs_true( player.revivetrigger ) )
+    if ( zs_over_downed( player ) )
         return 0;
 
     return 1;
+}
+
+/*
+    Whether this player is standing in a downed teammate's revive
+    trigger -- .revivetrigger belongs to the player who is down, so
+    reading it on the presser only ever asked whether they were down
+    themselves, which zs_player_ok() has already refused.
+
+    Worked out here rather than through zm_utility::in_revive_trigger(),
+    because zs_machine_prompt_hold() writes that function's own cache to
+    take the machine's prompt away, and asking it would read ZShare's
+    answer back.
+*/
+zs_over_downed( player )
+{
+    players = getplayers();
+
+    for ( i = 0; i < players.size; i++ )
+    {
+        other = players[i];
+
+        if ( !isdefined( other ) || other == player )
+            continue;
+
+        if ( !isdefined( other.revivetrigger ) )
+            continue;
+
+        if ( player istouching( other.revivetrigger ) )
+            return 1;
+    }
+
+    return 0;
 }
 
 zs_pair_ok( a, b )
@@ -835,7 +911,13 @@ zs_offer_make( to )
 
     self.zs_offer_to = to;
     self.zs_offer_weapon = weapon;
-    self.zs_offer_serial = zs_true( self.zs_offer_serial ) + 1;
+    // Counted up, not read as a yes/no: zs_true() makes every serial
+    // after the first the same number, and a watcher that cannot tell
+    // its offer from the one before never lapses or cancels it.
+    if ( !isdefined( self.zs_offer_serial ) )
+        self.zs_offer_serial = 0;
+
+    self.zs_offer_serial++;
 
     self zs_say( "MSG_OFFER_SENT", to, int( level.zs.trade_offer_time ) );
     to zs_say( "MSG_OFFER_RECEIVED", self );
@@ -907,7 +989,7 @@ zs_offer_watcher( serial )
         if ( !isdefined( self ) || !isdefined( self.zs_offer_to ) )
             return;
 
-        if ( zs_true( self.zs_offer_serial ) != serial )
+        if ( !isdefined( self.zs_offer_serial ) || self.zs_offer_serial != serial )
             return;
 
         to = self.zs_offer_to;
@@ -1021,14 +1103,28 @@ zs_weapon_record( player, weapon )
     r = spawnstruct();
     r.weapon = weapon;
     r.data = zm_weapons::get_player_weapondata( player, weapon );
-    r.aat = aat::getaatonweapon( weapon );
+
+    /*
+        On the player who owns the gun, and the *name* of what it has:
+        getaatonweapon() hands back the level struct
+        (aat_shared.gsc:695), and acquire() wants the name it is keyed
+        by (:731). Called unqualified this read self, which through
+        zs_trade_do() is always the accepter, so the offerer's Alternate
+        Ammo Type was lost and the accepter's struct was written into the
+        receiver's table, where every later read of it indexes level.aat
+        with a struct.
+    */
+    theirs = player aat::getaatonweapon( weapon );
+
+    if ( isdefined( theirs ) )
+        r.aat = theirs.name;
 
     return r;
 }
 
 zs_weapon_take( weapon )
 {
-    if ( isdefined( aat::getaatonweapon( weapon ) ) )
+    if ( isdefined( self aat::getaatonweapon( weapon ) ) )
         self aat::remove( weapon );
 
     self zm_weapons::weapon_take( weapon );
@@ -1423,13 +1519,40 @@ zs_chat_listener()
 */
 zs_word_after( msg, token )
 {
-    if ( getsubstr( msg, 0, token.size ) == token )
+    /*
+        getsubstr()'s third argument is where to stop, not how many
+        characters to take -- stock reads a map name with
+        getsubstr( mapname, 3, mapname.size ) and chops three characters
+        with getsubstr( weapon, 0, weapon.size - 3 ). Given token.size
+        there, the skipped-character form compared one character too few
+        and never matched, so !tip was dead on any client that puts a
+        character in front of the message.
+
+        And the word has to end where the token does: "!tipsy" is not
+        "!tip", and reading its "sy" as an amount is how a chat line
+        nobody meant for ZShare reached the tip code.
+    */
+    if ( zs_word_starts( msg, 0, token ) )
         return zs_trim( getsubstr( msg, token.size ) );
 
-    if ( msg.size > 1 && getsubstr( msg, 1, token.size ) == token )
+    if ( msg.size > 1 && zs_word_starts( msg, 1, token ) )
         return zs_trim( getsubstr( msg, 1 + token.size ) );
 
     return undefined;
+}
+
+zs_word_starts( msg, at, token )
+{
+    end = at + token.size;
+
+    if ( msg.size < end )
+        return 0;
+
+    if ( getsubstr( msg, at, end ) != token )
+        return 0;
+
+    // The whole message, or a space after it.
+    return msg.size == end || getsubstr( msg, end, end + 1 ) == " ";
 }
 
 zs_trim( s )
@@ -1804,6 +1927,18 @@ zs_box_pay( player )
 
     before = player.score;
     player zm_score::minus_to_player_score( cost );
+
+    /*
+        Nothing was actually taken: Shopping Free makes a purchase cost
+        nothing and is spent doing it, so the gobblegum would have gone
+        on somebody else's turn and left a payment worth nothing to take
+        back.
+    */
+    if ( before - player.score <= 0 )
+    {
+        player zs_deny( "MSG_PAY_NOTHING_TAKEN" );
+        return;
+    }
 
     level.zs_box_paid = 1;
     level.zs_box_paid_by = player;
@@ -2309,6 +2444,18 @@ zs_pap_pay( player )
     before = player.score;
     player zm_score::minus_to_player_score( cost );
 
+    /*
+        Nothing was actually taken: Shopping Free makes a purchase cost
+        nothing and is spent doing it, so the gobblegum would have gone
+        on somebody else's turn and left a payment worth nothing to take
+        back.
+    */
+    if ( before - player.score <= 0 )
+    {
+        player zs_deny( "MSG_PAY_NOTHING_TAKEN" );
+        return;
+    }
+
     self.zs_paid = 1;
     self.zs_paid_by = player;
     self.zs_paid_amount = before - player.score;
@@ -2678,6 +2825,18 @@ zs_perk_pay( player )
     before = player.score;
     player zm_score::minus_to_player_score( cost );
 
+    /*
+        Nothing was actually taken: Shopping Free makes a purchase cost
+        nothing and is spent doing it, so the gobblegum would have gone
+        on somebody else's turn and left a payment worth nothing to take
+        back.
+    */
+    if ( before - player.score <= 0 )
+    {
+        player zs_deny( "MSG_PAY_NOTHING_TAKEN" );
+        return;
+    }
+
     self.zs_paid = 1;
     self.zs_paid_by = player;
     self.zs_paid_amount = before - player.score;
@@ -2740,6 +2899,16 @@ zs_perk_watch()
                 continue;
 
             if ( trig.script_noteworthy != perk )
+                continue;
+
+            /*
+                And the drinker has to be at that machine. Stock raises
+                perk_purchased for perks that never touched one -- Der
+                Wunderfizz (_zm_perk_random.gsc), Zetsubou's fruit and the
+                spider quest's free Widow's Wine -- and a payment waiting
+                at the machine across the map was spent on those.
+            */
+            if ( distancesquared( self.origin, trig.origin ) > 10000 )
                 continue;
 
             trig zs_perk_paid_used( self );
@@ -3278,6 +3447,8 @@ zs_text( key, a, b )
         return "^3" + zs_text_player( a ) + "^7 gave you " + b + " points";
     if ( key == "MSG_NOTHING_WAITING" )
         return "Nothing of yours is waiting at the box or the Pack-a-Punch";
+    if ( key == "MSG_PAY_NOTHING_TAKEN" )
+        return "Your points were not taken -- nothing to pay with";
     if ( key == "MSG_NEED_POINTS" )
         return "You need " + a + " points";
     if ( key == "HINT_TAKE_BACK" )
@@ -3340,6 +3511,110 @@ zs_text( key, a, b )
     return key;
 }
 // ZS_TEXT_END
+
+
+/* ==================================================================
+    THE SHARED MOD API
+
+    Xep's mods find each other on level.zmods: an array keyed by mod id,
+    each key a struct saying what that mod is and handing over the few
+    things another mod may ask it to do. ZShare's goes up as the script
+    finishes loading, and again -- saying enabled 0 -- when zs_enabled is
+    off, since "not installed" and "installed and switched off" are
+    different answers.
+
+    api_version 1 is this. The descriptor is the contract: level.zs is
+    ZShare's own struct and may move.
+   ================================================================== */
+
+/*
+    The version on its own -- no build time, no origin -- because that is
+    what the descriptor carries for another mod to read. Written by
+    tools/build.py between the markers; never edit it by hand.
+*/
+zs_version()
+{
+    // ZS_VERSION_BEGIN
+    return "1.3";
+    // ZS_VERSION_END
+}
+
+/*
+    The descriptor. Written into whatever registry is already there --
+    another mod may have made it first, and replacing the array would be
+    that mod's entry gone.
+*/
+zs_api_register( benabled )
+{
+    if ( !isdefined( level.zmods ) )
+        level.zmods = [];
+
+    if ( !isdefined( level.zmods[ "zshare" ] ) )
+        level.zmods[ "zshare" ] = spawnstruct();
+
+    mod = level.zmods[ "zshare" ];
+
+    mod.id = "zshare";
+    mod.display_name = "ZShare";
+    mod.version = zs_version();
+    mod.api_version = 1;
+    mod.settings_manifest_version = 1;
+    mod.enabled = benabled;
+
+    mod.reload_config = &zs_api_reload_config;
+    mod.get_stock_perk_limit = &zs_api_stock_perk_limit;
+    mod.get_effective_perk_limit = &zs_api_effective_perk_limit;
+}
+
+/*
+    Read the settings again -- for a mod that has just written one of
+    ZShare's dvars and wants it to count now rather than at the next
+    press. 1 when there was something to read.
+*/
+zs_api_reload_config()
+{
+    if ( !zs_true( level.zs_loaded ) || !isdefined( level.zs ) || !level.zs.enabled )
+        return 0;
+
+    zs_load_config();
+    return 1;
+}
+
+/*
+    The limit the map would give this player if ZShare were not here: the
+    callback ZShare kept before installing its own, which on a map that
+    sets one is that map's and includes the slots it adds.
+*/
+zs_api_stock_perk_limit( player )
+{
+    if ( !isdefined( player ) )
+        return 0;
+
+    if ( isdefined( level.zs_perk_limit_stock ) )
+        return player [[ level.zs_perk_limit_stock ]]();
+
+    if ( isdefined( level.perk_purchase_limit ) )
+        return level.perk_purchase_limit;
+
+    return 4;
+}
+
+/*
+    And the limit ZShare is actually holding the map to, map bonuses and
+    all -- the same number every machine gets when it asks. ZShare installs
+    no override at all while zs_perk_limit is 0, and the honest answer then
+    is the map's own.
+*/
+zs_api_effective_perk_limit( player )
+{
+    if ( !isdefined( player ) )
+        return 0;
+
+    if ( !zs_true( level.zs_loaded ) || !isdefined( level.zs ) || level.zs.perk_limit == 0 )
+        return zs_api_stock_perk_limit( player );
+
+    return player zs_perk_limit_get();
+}
 
 
 /* ==================================================================
