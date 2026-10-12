@@ -6,7 +6,9 @@ by Xep
 
 [**Download the latest release**](https://github.com/Xeptix/ZShareT7/releases/latest)
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F6L1285ROA)
+[![Support the mod on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F6L1285ROA)
+[![Support the mod on Patreon](https://img.shields.io/badge/Patreon-Xeptix-F96854?logo=patreon&logoColor=white)](https://www.patreon.com/Xeptix)
+[![Join the Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/RE85HRwYZZ)
 
 Trade guns with a teammate, hand them points, give away a box hit or a Pack-a-Punch you
 don't want, and pay for a teammate's perk, spin or pack. All of it from the use button,
@@ -49,7 +51,7 @@ you play:
 | **BOIII** or **Ezz BOIII** | `Black Ops III\boiii\custom_scripts\zshare.gsc` | your Black Ops III folder |
 | **BOIII**, per user | `AppData\boiii\data\custom_scripts\zshare.gsc` | `%localappdata%` |
 | **T7x** | `t7x\custom_scripts\zshare.gsc` | your Black Ops III folder |
-| **The injected build** | `t7-compiler\scripts\zshare\main.gsc` | your compiler project |
+| **The injected build** | everything inside `t7-compiler` | your compiler project |
 
 Original BOIII reads both of its script folders, so either works there; the one under
 `%localappdata%` survives verifying the game's files, and the one in the game folder travels
@@ -62,6 +64,13 @@ game has started.
 **T7x runs compiled scripts only**, so its copy is not readable text like the others - it
 is the same ZShare, compiled. It goes in the `t7x` folder inside your Black Ops III folder,
 under the name `zshare.gsc`.
+
+**The injected build runs alongside the other Z mods.** The t7-compiler compiles every script in
+a project into one and injects it over one stock script, so the Z mods share one layout for it:
+`gsc.conf`, `README.md`, `scripts\zbundle\zshare.gsc` and `components\zshare.json`. Copy ZShare's
+`t7-compiler` folder and any other Z mod's into the same compiler project - the shared files are
+the same in all of them - then compile and inject that project once. Injecting them one after
+another as separate projects runs only the last one.
 
 **The settings menu is the `ui_scripts\zshare` folder beside each of those**, and it is
 optional - ZShare runs without it, and every setting is still a dvar. Copy it the same way
@@ -80,10 +89,11 @@ easier install and works on a stock copy of the game; the loose script needs a c
 loads one, and leaves your mod slot free for something else.
 
 **The Workshop version speaks every language Black Ops III is sold in** - English, French,
-Italian, Spanish, German, Portuguese, Russian, Polish, Japanese, and Traditional and
+Italian, Spanish, German, Brazilian Portuguese, Russian, Polish, Japanese, and Traditional and
 Simplified Chinese. Each player reads the prompts and messages in the language their own
 game is set to, so a French host and a Japanese teammate each read their own. The loose
-script is in English.
+script's prompts and messages are in English; its settings page is translated on every route -
+see [The settings menu](#the-settings-menu).
 
 **With both installed**, whichever loads first runs and the other stands down - they do not
 stack. `zs_only_script` and `zs_only_mod` force the choice if you want to test one against
@@ -286,6 +296,16 @@ zombies game shows or uses - the mod's own copy of them on the Workshop build, y
 three loose clients, which have no mod to keep them in. The t7-compiler route has no way in at
 all: it injects into a game that loads no menus of its own.
 
+**In your language.** The page reads in the language your game is set to, on the Workshop build
+and on BOIII, Ezz BOIII and T7x alike: French, Italian, Spanish, German, Brazilian Portuguese,
+Russian, Polish, Japanese, and Traditional and Simplified Chinese. A setting's console name
+(`zs_...`) and its numbers stay as they are in every language; the choices are translated with the
+rest.
+
+**The translations are made by AI and may contain mistakes.** If you find one, please tell Xep on
+the [Discord](https://discord.gg/RE85HRwYZZ): the game and ZShare version, the language, the
+setting or line, what it says now and what it should say. A screenshot helps.
+
 It is the host's page only: every setting is one of the host's dvars, and a guest changing one
 would change nothing. The sound rows offer the four aliases ZShare itself uses, plus silence -
 the others in [Sounds](#sounds) are still the console's.
@@ -359,8 +379,9 @@ III gives a script:
   does the same thing with its mod folder, and the same two settings pick between them.
 - **The Workshop version is translated.** A mod built with the mod tools carries its own
   words for every language the game ships, and each player's game draws them in its own
-  language. A loose script has nowhere to carry them, so it is in English, as every other
-  port is.
+  language. A loose script has nowhere to carry them, so its prompts and messages are in
+  English, as every other port's are. The settings page carries its own translations, so it is
+  translated on every route.
 - **Nothing stock is replaced.** The other ports replace one or two of the game's own
   functions. This port uses the hooks the game already offers and, where it needs a loop of
   its own, ends the stock one the way the game ends it and runs its copy in the same frame
@@ -441,6 +462,27 @@ folders, Black Ops 4's mod folder - with one installer that asks which of them t
 ---
 
 ## Changelog
+
+### v1.4
+
+- **The settings page speaks your language** on every route, the loose clients included, in
+  every language Black Ops III is sold in. The translations are made by AI; see
+  [The settings menu](#the-settings-menu) for how to report a mistake.
+- **The settings page handles like the other Z mods' pages.** Holding Q/E or the bumpers walks
+  the categories in one steady repeat however the key arrives, the page opens on the first
+  category's title, the category description runs the full width of the page, and a value you
+  pick stays picked even when it is also the default.
+- **Shortcuts in the pause menu follow who may use them.** A shortcut only the host can use is
+  drawn for the host alone and refused to anyone else at the press, and an action row is pressed
+  only from the row you are actually on.
+- **Chat words answer once** when ZShare is loaded twice, for example ZBundle selected under
+  Mods with a loose copy installed beside it.
+- **The injected build runs alongside the other Z mods.** Its `t7-compiler` folder is laid out
+  the way every Z mod's is now, so several of them copied into one compiler project compile and
+  inject together. It replaces `scripts\zshare\main.gsc`; delete that one from your compiler
+  project when you copy the new folder in. See [Install](#install).
+- **A Discord**, linked at the top of this README beside Ko-fi and Patreon, for questions,
+  bugs and ideas.
 
 ### v1.3
 

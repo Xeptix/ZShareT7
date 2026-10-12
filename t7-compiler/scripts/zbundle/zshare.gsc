@@ -1,6 +1,10 @@
+// Generated overlay-safe Z Mod fragment; do not edit.
+#namespace zbundle;
+
+// ===== BEGIN ZSHARE =====
 /*
 ======================================================================
-    ZSHARE T7 v1.3  --  Weapon sharing for Black Ops III Zombies
+    ZSHARE T7 v1.4  --  Weapon sharing for Black Ops III Zombies
 
     by Xep
 
@@ -55,8 +59,6 @@
     carry it in English; the Workshop build carries the same keys over
     localized strings, so each player reads their own language.
 
-    docs/porting-t7.md in the project has the detail.
-
 ----------------------------------------------------------------------
     VERIFICATION
 
@@ -98,7 +100,6 @@
 #include scripts\zm\_zm_utility;
 #include scripts\zm\_zm_weapons;
 
-#namespace zshare;
 
 
 /* ==================================================================
@@ -110,12 +111,12 @@
     game's own.
    ================================================================== */
 
-autoexec __init__sytem__()
+autoexec zshare____init__sytem__()
 {
-    system::register( "zshare", ::__init__, undefined, undefined );
+    system::register( "zshare", ::zshare____init__, undefined, undefined );
 }
 
-__init__()
+zshare____init__()
 {
     /*
         The gate belongs here as well as in init(). Both copies register
@@ -127,10 +128,10 @@ __init__()
         other, which is not the test zs_only_script and zs_only_mod exist
         to run.
     */
-    if ( !zs_origin_allowed() )
+    if ( !zshare__zs_origin_allowed() )
         return;
 
-    callback::on_start_gametype( ::init );
+    callback::on_start_gametype( ::zshare__init );
 
     /*
         The player callbacks are the other half of what installs ZShare,
@@ -145,8 +146,8 @@ __init__()
     if ( getdvarstring( "zs_enabled" ) == "0" )
         return;
 
-    callback::on_connect( ::zs_on_connect );
-    callback::on_spawned( ::zs_on_spawned );
+    callback::on_connect( ::zshare__zs_on_connect );
+    callback::on_spawned( ::zshare__zs_on_spawned );
 }
 
 /*
@@ -161,7 +162,7 @@ __init__()
     Written by mk_t7_variants.py when it generates the Workshop copy,
     the same way build.py writes the version stamp. Never edit by hand.
 */
-zs_origin()
+zshare__zs_origin()
 {
     // ZS_ORIGIN_BEGIN
     return "script";
@@ -174,9 +175,9 @@ zs_origin()
     instead -- one nobody has set comes back "", which carries on, and
     that is the default.
 */
-zs_origin_allowed()
+zshare__zs_origin_allowed()
 {
-    origin = zs_origin();
+    origin = zshare__zs_origin();
 
     if ( getdvarstring( "zs_only_script" ) == "1" && origin != "script" )
         return 0;
@@ -191,9 +192,9 @@ zs_origin_allowed()
     Whether this copy is the one that was asked for. Neither setting on
     -- which is the default -- means whichever loads first, as before.
 */
-zs_origin_wanted()
+zshare__zs_origin_wanted()
 {
-    origin = zs_origin();
+    origin = zshare__zs_origin();
 
     if ( level.zs.only_script && origin != "script" )
         return 0;
@@ -204,9 +205,9 @@ zs_origin_wanted()
     return 1;
 }
 
-init()
+zshare__init()
 {
-    if ( zs_true( level.zs_loaded ) )
+    if ( zshare__zs_true( level.zs_loaded ) )
         return;
 
     /*
@@ -215,9 +216,9 @@ init()
         has to leave level.zs_loaded alone so the other one can still
         take it.
     */
-    zs_load_config();
+    zshare__zs_load_config();
 
-    if ( !zs_origin_wanted() )
+    if ( !zshare__zs_origin_wanted() )
         return;
 
     level.zs_loaded = 1;
@@ -229,43 +230,43 @@ init()
     */
     if ( !level.zs.enabled )
     {
-        zs_api_register( 0 );
+        zshare__zs_api_register( 0 );
         return;
     }
 
     level.zs_triggers = [];
     level.zs_machine_triggers = [];
 
-    zs_box_paid_clear();
+    zshare__zs_box_paid_clear();
 
-    level thread zs_trigger_updater();
-    level thread zs_box_hook();
-    level thread zs_late_hooks();
-    level thread zs_machine_updater();
-    level thread zs_config_watcher();
-    level thread zs_config_printer();
-    level thread zs_build_watermark();
+    level thread zshare__zs_trigger_updater();
+    level thread zshare__zs_box_hook();
+    level thread zshare__zs_late_hooks();
+    level thread zshare__zs_machine_updater();
+    level thread zshare__zs_config_watcher();
+    level thread zshare__zs_config_printer();
+    level thread zshare__zs_build_watermark();
 
     // Last, so the first thing that reads it finds a mod already up.
-    zs_api_register( 1 );
+    zshare__zs_api_register( 1 );
 
 }
 
-zs_on_connect()
+zshare__zs_on_connect()
 {
-    self thread zs_player_think();
-    self thread zs_chat_listener();
-    self thread zs_perk_watch();
-    self thread zs_pap_taken_watch();
+    self thread zshare__zs_player_think();
+    self thread zshare__zs_chat_listener();
+    self thread zshare__zs_perk_watch();
+    self thread zshare__zs_pap_taken_watch();
 }
 
-zs_on_spawned()
+zshare__zs_on_spawned()
 {
     // zs_player_think() waits on "spawned_player" itself; this is only
     // here so a player who connected before the script was up still gets
     // a watcher.
-    if ( !zs_true( self.zs_thinking ) )
-        self thread zs_player_think();
+    if ( !zshare__zs_true( self.zs_thinking ) )
+        self thread zshare__zs_player_think();
 }
 
 /*
@@ -273,7 +274,7 @@ zs_on_spawned()
     as a parameter name and never as a function a script can call -- so
     it is carried here, as the T4 and T8 ports carry theirs.
 */
-zs_true( v )
+zshare__zs_true( v )
 {
     return isdefined( v ) && v;
 }
@@ -287,7 +288,7 @@ zs_true( v )
     seconds and on every press, so a change applies without a restart.
    ================================================================== */
 
-zs_load_config()
+zshare__zs_load_config()
 {
     if ( !isdefined( level.zs ) )
         level.zs = spawnstruct();
@@ -305,7 +306,7 @@ zs_load_config()
         can do safely in the middle of a game, so this one lands on the
         next match -- which is what a bundle's MODS page says about it.
     */
-    level.zs.enabled = zs_cfg_int( "zs_enabled", 1 );
+    level.zs.enabled = zshare__zs_cfg_int( "zs_enabled", 1 );
 
     // --- origin ----------------------------------------------------
 
@@ -320,40 +321,40 @@ zs_load_config()
         single time per game, so changing either mid-match cannot move
         which copy is already running. End the game and start a new one.
     */
-    level.zs.only_script      = zs_cfg_int( "zs_only_script", 0 );
-    level.zs.only_mod         = zs_cfg_int( "zs_only_mod", 0 );
+    level.zs.only_script      = zshare__zs_cfg_int( "zs_only_script", 0 );
+    level.zs.only_mod         = zshare__zs_cfg_int( "zs_only_mod", 0 );
 
     // --- debug -----------------------------------------------------
 
     // Print what the script decides and why, to the console and the host.
-    level.zs.debug            = zs_cfg_int( "zs_debug", 0 );
+    level.zs.debug            = zshare__zs_cfg_int( "zs_debug", 0 );
 
     // --- trading ---------------------------------------------------
 
     // Trade weapons with a teammate: use on them to offer, use back to accept.
-    level.zs.trade            = zs_cfg_int( "zs_trade", 1 );
+    level.zs.trade            = zshare__zs_cfg_int( "zs_trade", 1 );
 
     // How long an offer stays open before it lapses on its own.
-    level.zs.trade_offer_time = zs_cfg_float( "zs_trade_offer_time", 10 );
+    level.zs.trade_offer_time = zshare__zs_cfg_float( "zs_trade_offer_time", 10 );
 
     // Whether a Pack-a-Punched weapon can be traded.
-    level.zs.trade_upgraded   = zs_cfg_int( "zs_trade_upgraded", 1 );
+    level.zs.trade_upgraded   = zshare__zs_cfg_int( "zs_trade_upgraded", 1 );
 
     /*
         How close you have to be for the prompt to appear, in units. An
         offer lapses on its own once the two of you are more than twice
         this apart.
     */
-    level.zs.range            = zs_cfg_int( "zs_range", 64 );
+    level.zs.range            = zshare__zs_cfg_int( "zs_range", 64 );
 
     // --- points ----------------------------------------------------
 
     // Crouch, look at a teammate and press use to give them points.
-    level.zs.points           = zs_cfg_int( "zs_points", 1 );
-    level.zs.points_amount    = zs_cfg_int( "zs_points_amount", 1000 );
+    level.zs.points           = zshare__zs_cfg_int( "zs_points", 1 );
+    level.zs.points_amount    = zshare__zs_cfg_int( "zs_points_amount", 1000 );
 
     // Seconds between gifts from one player.
-    level.zs.points_cooldown  = zs_cfg_float( "zs_points_cooldown", 1 );
+    level.zs.points_cooldown  = zshare__zs_cfg_float( "zs_points_cooldown", 1 );
 
     // --- thanks ----------------------------------------------------
 
@@ -364,20 +365,20 @@ zs_load_config()
         anywhere. !tip sends any amount to anybody, favour or not. The
         points come out of the thanker either way, so nothing is minted.
     */
-    level.zs.thank            = zs_cfg_int( "zs_thank", 1 );
-    level.zs.thank_amount     = zs_cfg_int( "zs_thank_amount", 100 );
+    level.zs.thank            = zshare__zs_cfg_int( "zs_thank", 1 );
+    level.zs.thank_amount     = zshare__zs_cfg_int( "zs_thank_amount", 100 );
 
     // How long a good turn stays thankable, in seconds.
-    level.zs.thank_time       = zs_cfg_float( "zs_thank_time", 30 );
+    level.zs.thank_time       = zshare__zs_cfg_float( "zs_thank_time", 30 );
 
     // --- sharing ---------------------------------------------------
 
     // Share a box hit: crouch and press use at the box while the weapon
     // you paid for is up, and anybody can take it.
-    level.zs.box_share        = zs_cfg_int( "zs_box_share", 1 );
+    level.zs.box_share        = zshare__zs_cfg_int( "zs_box_share", 1 );
 
     // The same at the Pack-a-Punch, for the upgraded weapon waiting there.
-    level.zs.pap_share        = zs_cfg_int( "zs_pap_share", 1 );
+    level.zs.pap_share        = zshare__zs_cfg_int( "zs_pap_share", 1 );
 
     // --- paying ----------------------------------------------------
 
@@ -388,9 +389,9 @@ zs_load_config()
         machine at a time, and a crouched press from whoever paid takes it
         back.
     */
-    level.zs.perk_pay         = zs_cfg_int( "zs_perk_pay", 1 );
-    level.zs.box_pay          = zs_cfg_int( "zs_box_pay", 1 );
-    level.zs.pap_pay          = zs_cfg_int( "zs_pap_pay", 1 );
+    level.zs.perk_pay         = zshare__zs_cfg_int( "zs_perk_pay", 1 );
+    level.zs.box_pay          = zshare__zs_cfg_int( "zs_box_pay", 1 );
+    level.zs.pap_pay          = zshare__zs_cfg_int( "zs_pap_pay", 1 );
 
     // --- perks -----------------------------------------------------
 
@@ -400,15 +401,15 @@ zs_load_config()
         A map that gives a player extra slots of its own keeps them on
         top of this.
     */
-    level.zs.perk_limit       = zs_cfg_int( "zs_perk_limit", 0 );
+    level.zs.perk_limit       = zshare__zs_cfg_int( "zs_perk_limit", 0 );
 
     // --- presentation ----------------------------------------------
 
     // Tell players what the prompts do, once, shortly after they spawn.
-    level.zs.show_hint        = zs_cfg_int( "zs_show_hint", 1 );
+    level.zs.show_hint        = zshare__zs_cfg_int( "zs_show_hint", 1 );
 
     // The one-line messages. Off leaves the prompts and the sounds.
-    level.zs.messages         = zs_cfg_int( "zs_messages", 1 );
+    level.zs.messages         = zshare__zs_cfg_int( "zs_messages", 1 );
 
     // --- sounds ----------------------------------------------------
 
@@ -416,11 +417,11 @@ zs_load_config()
         Stock aliases, so the script stays one drop-in file. Set any to
         none for silence.
     */
-    level.zs.offer_sound      = zs_cfg_str( "zs_offer_sound", "zmb_perks_packa_ready" );
-    level.zs.trade_sound      = zs_cfg_str( "zs_trade_sound", "zmb_perks_packa_ready" );
-    level.zs.share_sound      = zs_cfg_str( "zs_share_sound", "zmb_perks_packa_ready" );
-    level.zs.points_sound     = zs_cfg_str( "zs_points_sound", "zmb_cha_ching" );
-    level.zs.deny_sound       = zs_cfg_str( "zs_deny_sound", "zmb_no_cha_ching" );
+    level.zs.offer_sound      = zshare__zs_cfg_str( "zs_offer_sound", "zmb_perks_packa_ready" );
+    level.zs.trade_sound      = zshare__zs_cfg_str( "zs_trade_sound", "zmb_perks_packa_ready" );
+    level.zs.share_sound      = zshare__zs_cfg_str( "zs_share_sound", "zmb_perks_packa_ready" );
+    level.zs.points_sound     = zshare__zs_cfg_str( "zs_points_sound", "zmb_cha_ching" );
+    level.zs.deny_sound       = zshare__zs_cfg_str( "zs_deny_sound", "zmb_no_cha_ching" );
 
     // Height of the prompt volume, in units. Not a setting.
     level.zs.height = 72;
@@ -436,12 +437,12 @@ zs_load_config()
     console would be overwritten on the next read. "none" is how a string
     setting is emptied instead.
 */
-zs_cfg_str( dvar, def )
+zshare__zs_cfg_str( dvar, def )
 {
     if ( getdvarstring( dvar ) == "" )
         setdvar( dvar, def );
 
-    value = zs_cfg_echo( dvar, getdvarstring( dvar ), def );
+    value = zshare__zs_cfg_echo( dvar, getdvarstring( dvar ), def );
 
     if ( value == "none" )
         return "";
@@ -449,14 +450,14 @@ zs_cfg_str( dvar, def )
     return value;
 }
 
-zs_cfg_int( dvar, def )
+zshare__zs_cfg_int( dvar, def )
 {
-    return int( zs_cfg_str( dvar, "" + def ) );
+    return int( zshare__zs_cfg_str( dvar, "" + def ) );
 }
 
-zs_cfg_float( dvar, def )
+zshare__zs_cfg_float( dvar, def )
 {
-    return float( zs_cfg_str( dvar, "" + def ) );
+    return float( zshare__zs_cfg_str( dvar, "" + def ) );
 }
 
 
@@ -464,12 +465,12 @@ zs_cfg_float( dvar, def )
     PLAYERS
    ================================================================== */
 
-zs_player_think()
+zshare__zs_player_think()
 {
     self endon( "disconnect" );
     level endon( "end_game" );
 
-    if ( zs_true( self.zs_thinking ) )
+    if ( zshare__zs_true( self.zs_thinking ) )
         return;
 
     self.zs_thinking = 1;
@@ -480,17 +481,17 @@ zs_player_think()
 
         // A prompt is linked to the player it belongs to, and a respawn
         // puts that player back into the world.
-        zs_relink_prompts( self );
+        zshare__zs_relink_prompts( self );
 
-        if ( level.zs.show_hint && !zs_true( self.zs_hinted ) )
+        if ( level.zs.show_hint && !zshare__zs_true( self.zs_hinted ) )
         {
             self.zs_hinted = 1;
-            self thread zs_hint();
+            self thread zshare__zs_hint();
         }
     }
 }
 
-zs_hint()
+zshare__zs_hint()
 {
     self endon( "disconnect" );
     level endon( "end_game" );
@@ -502,17 +503,17 @@ zs_hint()
 
     // zs_show_hint is these two lines' own switch, so zs_messages does
     // not silence them.
-    self zs_tell( "MSG_INTRO_TRADE" );
+    self zshare__zs_tell( "MSG_INTRO_TRADE" );
 
     wait 4;
 
     if ( !isdefined( self ) )
         return;
 
-    self zs_tell( "MSG_INTRO_PAY" );
+    self zshare__zs_tell( "MSG_INTRO_PAY" );
 }
 
-zs_player_ok( player )
+zshare__zs_player_ok( player )
 {
     if ( !isdefined( player ) || !isplayer( player ) || !isalive( player ) )
         return 0;
@@ -530,12 +531,12 @@ zs_player_ok( player )
     Everything above, and not standing over a downed teammate: a crouch
     there is a revive, and the revive wins.
 */
-zs_payer_ok( player )
+zshare__zs_payer_ok( player )
 {
-    if ( !zs_player_ok( player ) )
+    if ( !zshare__zs_player_ok( player ) )
         return 0;
 
-    if ( zs_over_downed( player ) )
+    if ( zshare__zs_over_downed( player ) )
         return 0;
 
     return 1;
@@ -552,7 +553,7 @@ zs_payer_ok( player )
     take the machine's prompt away, and asking it would read ZShare's
     answer back.
 */
-zs_over_downed( player )
+zshare__zs_over_downed( player )
 {
     players = getplayers();
 
@@ -573,18 +574,18 @@ zs_over_downed( player )
     return 0;
 }
 
-zs_pair_ok( a, b )
+zshare__zs_pair_ok( a, b )
 {
     if ( !isdefined( a ) || !isdefined( b ) || a == b )
         return 0;
 
-    if ( !zs_player_ok( a ) || !zs_player_ok( b ) )
+    if ( !zshare__zs_player_ok( a ) || !zshare__zs_player_ok( b ) )
         return 0;
 
-    return zs_game_ready();
+    return zshare__zs_game_ready();
 }
 
-zs_crouched( player )
+zshare__zs_crouched( player )
 {
     if ( !isdefined( player ) )
         return 0;
@@ -595,7 +596,7 @@ zs_crouched( player )
 }
 
 // Nobody to pay for in solo.
-zs_pay_team_check()
+zshare__zs_pay_team_check()
 {
     return getplayers().size > 1;
 }
@@ -619,7 +620,7 @@ zs_pay_team_check()
     already shows and only sent when it changes.
    ================================================================== */
 
-zs_prompt_make( target, viewer )
+zshare__zs_prompt_make( target, viewer )
 {
     t = spawn( "trigger_radius_use", target.origin + ( 0, 0, 36 ), 0, level.zs.range, level.zs.height );
     t setcursorhint( "HINT_NOICON" );
@@ -640,14 +641,14 @@ zs_prompt_make( target, viewer )
     t.zs_hint = "";
     t.zs_shown = 0;
 
-    t thread zs_prompt_think();
+    t thread zshare__zs_prompt_think();
 
     level.zs_triggers[level.zs_triggers.size] = t;
 
     return t;
 }
 
-zs_prompt_find( target, viewer )
+zshare__zs_prompt_find( target, viewer )
 {
     for ( i = 0; i < level.zs_triggers.size; i++ )
     {
@@ -668,7 +669,7 @@ zs_prompt_find( target, viewer )
     on connect, so a late joiner, a rebuilt prompt and a changed range
     all heal the same way.
 */
-zs_prompts_ensure()
+zshare__zs_prompts_ensure()
 {
     players = getplayers();
 
@@ -682,13 +683,13 @@ zs_prompts_ensure()
             if ( !isdefined( players[i] ) || !isdefined( players[j] ) )
                 continue;
 
-            if ( !isdefined( zs_prompt_find( players[i], players[j] ) ) )
-                zs_prompt_make( players[i], players[j] );
+            if ( !isdefined( zshare__zs_prompt_find( players[i], players[j] ) ) )
+                zshare__zs_prompt_make( players[i], players[j] );
         }
     }
 }
 
-zs_relink_prompts( target )
+zshare__zs_relink_prompts( target )
 {
     for ( i = 0; i < level.zs_triggers.size; i++ )
     {
@@ -703,7 +704,7 @@ zs_relink_prompts( target )
     }
 }
 
-zs_prompt_free( t )
+zshare__zs_prompt_free( t )
 {
     if ( !isdefined( t ) )
         return;
@@ -718,7 +719,7 @@ zs_prompt_free( t )
     what it says. Ten times a second, and the hint string is only written
     when it changes.
 */
-zs_trigger_updater()
+zshare__zs_trigger_updater()
 {
     level endon( "end_game" );
 
@@ -731,7 +732,7 @@ zs_trigger_updater()
         tick++;
 
         if ( tick % 10 == 0 )
-            zs_prompts_ensure();
+            zshare__zs_prompts_ensure();
 
         keep = [];
 
@@ -744,11 +745,11 @@ zs_trigger_updater()
 
             if ( !isdefined( t.zs_target ) || !isdefined( t.zs_viewer ) || t.zs_radius != level.zs.range )
             {
-                zs_prompt_free( t );
+                zshare__zs_prompt_free( t );
                 continue;
             }
 
-            t zs_prompt_update();
+            t zshare__zs_prompt_update();
             keep[keep.size] = t;
         }
 
@@ -756,12 +757,12 @@ zs_trigger_updater()
     }
 }
 
-zs_prompt_update()
+zshare__zs_prompt_update()
 {
     target = self.zs_target;
     viewer = self.zs_viewer;
 
-    want = zs_prompt_text( target, viewer );
+    want = zshare__zs_prompt_text( target, viewer );
 
     if ( want == "" )
     {
@@ -776,7 +777,7 @@ zs_prompt_update()
 
     if ( want != self.zs_hint )
     {
-        zs_hint_set( self, want );
+        zshare__zs_hint_set( self, want );
         self.zs_hint = want;
     }
 
@@ -788,19 +789,19 @@ zs_prompt_update()
     }
 }
 
-zs_prompt_text( target, viewer )
+zshare__zs_prompt_text( target, viewer )
 {
-    if ( !zs_pair_ok( target, viewer ) )
+    if ( !zshare__zs_pair_ok( target, viewer ) )
         return "";
 
-    if ( level.zs.points && zs_crouched( viewer ) )
+    if ( level.zs.points && zshare__zs_crouched( viewer ) )
     {
         /*
             A thank takes the crouched press while one is owed, because
             crouch already means "give them something" and a thank is a
             smaller one with a reason.
         */
-        if ( viewer zs_owes_thanks( target ) )
+        if ( viewer zshare__zs_owes_thanks( target ) )
             return "HINT_THANK=" + level.zs.thank_amount;
 
         return "HINT_GIVE_POINTS=" + level.zs.points_amount;
@@ -809,16 +810,16 @@ zs_prompt_text( target, viewer )
     if ( !level.zs.trade )
         return "";
 
-    if ( zs_offer_is( target, viewer ) )
+    if ( zshare__zs_offer_is( target, viewer ) )
         return "HINT_TRADE_ACCEPT";
 
-    if ( zs_offer_is( viewer, target ) )
+    if ( zshare__zs_offer_is( viewer, target ) )
         return "HINT_TRADE_CANCEL";
 
     return "HINT_TRADE";
 }
 
-zs_prompt_think()
+zshare__zs_prompt_think()
 {
     self endon( "zs_kill" );
     self endon( "death" );
@@ -835,25 +836,25 @@ zs_prompt_think()
         if ( user != self.zs_viewer )
             continue;
 
-        zs_load_config();
-        user zs_use_on( self.zs_target );
+        zshare__zs_load_config();
+        user zshare__zs_use_on( self.zs_target );
 
         // One press, one action.
         wait 0.3;
     }
 }
 
-zs_use_on( target )
+zshare__zs_use_on( target )
 {
-    if ( !zs_pair_ok( self, target ) )
+    if ( !zshare__zs_pair_ok( self, target ) )
         return;
 
-    if ( level.zs.points && zs_crouched( self ) )
+    if ( level.zs.points && zshare__zs_crouched( self ) )
     {
-        if ( self zs_owes_thanks( target ) )
-            self zs_thank( target );
+        if ( self zshare__zs_owes_thanks( target ) )
+            self zshare__zs_thank( target );
         else
-            self zs_points_give( target );
+            self zshare__zs_points_give( target );
 
         return;
     }
@@ -861,19 +862,19 @@ zs_use_on( target )
     if ( !level.zs.trade )
         return;
 
-    if ( zs_offer_is( target, self ) )
+    if ( zshare__zs_offer_is( target, self ) )
     {
-        zs_trade_do( target, self );
+        zshare__zs_trade_do( target, self );
         return;
     }
 
-    if ( zs_offer_is( self, target ) )
+    if ( zshare__zs_offer_is( self, target ) )
     {
-        self zs_offer_cancel( "withdrawn" );
+        self zshare__zs_offer_cancel( "withdrawn" );
         return;
     }
 
-    self zs_offer_make( target );
+    self zshare__zs_offer_make( target );
 }
 
 
@@ -887,7 +888,7 @@ zs_use_on( target )
     plant carries it.
    ================================================================== */
 
-zs_offer_is( from, to )
+zshare__zs_offer_is( from, to )
 {
     if ( !isdefined( from ) || !isdefined( to ) )
         return 0;
@@ -895,19 +896,19 @@ zs_offer_is( from, to )
     return isdefined( from.zs_offer_to ) && from.zs_offer_to == to;
 }
 
-zs_offer_make( to )
+zshare__zs_offer_make( to )
 {
     weapon = self getcurrentweapon();
-    why = self zs_untradeable( weapon );
+    why = self zshare__zs_untradeable( weapon );
 
     if ( why != "" )
     {
-        self zs_deny( why );
+        self zshare__zs_deny( why );
         return;
     }
 
     if ( isdefined( self.zs_offer_to ) )
-        self zs_offer_cancel( "replaced" );
+        self zshare__zs_offer_cancel( "replaced" );
 
     self.zs_offer_to = to;
     self.zs_offer_weapon = weapon;
@@ -919,63 +920,63 @@ zs_offer_make( to )
 
     self.zs_offer_serial++;
 
-    self zs_say( "MSG_OFFER_SENT", to, int( level.zs.trade_offer_time ) );
-    to zs_say( "MSG_OFFER_RECEIVED", self );
-    to zs_sound( level.zs.offer_sound );
+    self zshare__zs_say( "MSG_OFFER_SENT", to, int( level.zs.trade_offer_time ) );
+    to zshare__zs_say( "MSG_OFFER_RECEIVED", self );
+    to zshare__zs_sound( level.zs.offer_sound );
 
-    self thread zs_offer_watcher( self.zs_offer_serial );
+    self thread zshare__zs_offer_watcher( self.zs_offer_serial );
 }
 
-zs_offer_clear()
+zshare__zs_offer_clear()
 {
     self.zs_offer_to = undefined;
     self.zs_offer_weapon = undefined;
 }
 
-zs_offer_cancel( why )
+zshare__zs_offer_cancel( why )
 {
     to = self.zs_offer_to;
 
-    self zs_offer_clear();
+    self zshare__zs_offer_clear();
 
     if ( why == "withdrawn" )
     {
-        self zs_say( "MSG_TRADE_CANCELLED" );
+        self zshare__zs_say( "MSG_TRADE_CANCELLED" );
 
         if ( isdefined( to ) )
-            to zs_say( "MSG_TRADE_CANCELLED_BY", self );
+            to zshare__zs_say( "MSG_TRADE_CANCELLED_BY", self );
     }
     else if ( why == "expired" )
     {
-        self zs_say( "MSG_OFFER_LAPSED" );
+        self zshare__zs_say( "MSG_OFFER_LAPSED" );
 
         if ( isdefined( to ) )
-            to zs_say( "MSG_OFFER_LAPSED_BY", self );
+            to zshare__zs_say( "MSG_OFFER_LAPSED_BY", self );
     }
     else if ( why == "switched" || why == "lost" )
     {
-        self zs_say( "MSG_TRADE_PUT_AWAY" );
+        self zshare__zs_say( "MSG_TRADE_PUT_AWAY" );
 
         if ( isdefined( to ) )
-            to zs_say( "MSG_TRADE_PUT_AWAY_BY", self );
+            to zshare__zs_say( "MSG_TRADE_PUT_AWAY_BY", self );
     }
     else if ( why == "distance" )
     {
-        self zs_say( "MSG_TRADE_TOO_FAR" );
+        self zshare__zs_say( "MSG_TRADE_TOO_FAR" );
 
         if ( isdefined( to ) )
-            to zs_say( "MSG_TRADE_TOO_FAR_BY", self );
+            to zshare__zs_say( "MSG_TRADE_TOO_FAR_BY", self );
     }
     else if ( why == "replaced" )
     {
         if ( isdefined( to ) )
-            to zs_say( "MSG_TRADE_WITHDRAWN_BY", self );
+            to zshare__zs_say( "MSG_TRADE_WITHDRAWN_BY", self );
     }
 
-    zs_debug( "offer cancelled: " + why );
+    zshare__zs_debug( "offer cancelled: " + why );
 }
 
-zs_offer_watcher( serial )
+zshare__zs_offer_watcher( serial )
 {
     self endon( "disconnect" );
     level endon( "end_game" );
@@ -999,33 +1000,33 @@ zs_offer_watcher( serial )
 
         if ( gettime() - started > level.zs.trade_offer_time * 1000 )
         {
-            self zs_offer_cancel( "expired" );
+            self zshare__zs_offer_cancel( "expired" );
             return;
         }
 
-        if ( !zs_player_ok( self ) || !zs_player_ok( to ) )
+        if ( !zshare__zs_player_ok( self ) || !zshare__zs_player_ok( to ) )
         {
-            self zs_offer_cancel( "lost" );
+            self zshare__zs_offer_cancel( "lost" );
             return;
         }
 
         if ( self getcurrentweapon() != self.zs_offer_weapon )
         {
-            self zs_offer_cancel( "switched" );
+            self zshare__zs_offer_cancel( "switched" );
             return;
         }
 
         if ( distance( self.origin, to.origin ) > level.zs.range * 2 )
         {
-            self zs_offer_cancel( "distance" );
+            self zshare__zs_offer_cancel( "distance" );
             return;
         }
     }
 }
 
-zs_trade_do( a, b )
+zshare__zs_trade_do( a, b )
 {
-    if ( !zs_pair_ok( a, b ) )
+    if ( !zshare__zs_pair_ok( a, b ) )
         return;
 
     a_weapon = a getcurrentweapon();
@@ -1033,24 +1034,24 @@ zs_trade_do( a, b )
 
     if ( a_weapon != a.zs_offer_weapon )
     {
-        a zs_offer_cancel( "switched" );
+        a zshare__zs_offer_cancel( "switched" );
         return;
     }
 
-    why = a zs_untradeable( a_weapon );
+    why = a zshare__zs_untradeable( a_weapon );
 
     if ( why != "" )
     {
-        a zs_deny( why );
-        a zs_offer_cancel( "lost" );
+        a zshare__zs_deny( why );
+        a zshare__zs_offer_cancel( "lost" );
         return;
     }
 
-    why = b zs_untradeable( b_weapon );
+    why = b zshare__zs_untradeable( b_weapon );
 
     if ( why != "" )
     {
-        b zs_deny( why );
+        b zshare__zs_deny( why );
         return;
     }
 
@@ -1059,38 +1060,38 @@ zs_trade_do( a, b )
     // gun through on purpose, so it never catches this one.
     if ( a_weapon == b_weapon )
     {
-        b zs_deny( "MSG_ALREADY_HAVE" );
+        b zshare__zs_deny( "MSG_ALREADY_HAVE" );
         return;
     }
 
-    if ( b zs_carries_same_family( a_weapon, b_weapon ) )
+    if ( b zshare__zs_carries_same_family( a_weapon, b_weapon ) )
     {
-        b zs_deny( "MSG_ALREADY_HAVE" );
+        b zshare__zs_deny( "MSG_ALREADY_HAVE" );
         return;
     }
 
-    if ( a zs_carries_same_family( b_weapon, a_weapon ) )
+    if ( a zshare__zs_carries_same_family( b_weapon, a_weapon ) )
     {
-        b zs_deny( "MSG_ALREADY_CARRIES", a );
+        b zshare__zs_deny( "MSG_ALREADY_CARRIES", a );
         return;
     }
 
-    a zs_offer_clear();
+    a zshare__zs_offer_clear();
 
-    a_record = zs_weapon_record( a, a_weapon );
-    b_record = zs_weapon_record( b, b_weapon );
+    a_record = zshare__zs_weapon_record( a, a_weapon );
+    b_record = zshare__zs_weapon_record( b, b_weapon );
 
-    a zs_weapon_take( a_weapon );
-    b zs_weapon_take( b_weapon );
+    a zshare__zs_weapon_take( a_weapon );
+    b zshare__zs_weapon_take( b_weapon );
 
-    b zs_weapon_give( a_record );
-    a zs_weapon_give( b_record );
+    b zshare__zs_weapon_give( a_record );
+    a zshare__zs_weapon_give( b_record );
 
-    a zs_say( "MSG_TRADED_WITH", b );
-    b zs_say( "MSG_TRADED_WITH", a );
+    a zshare__zs_say( "MSG_TRADED_WITH", b );
+    b zshare__zs_say( "MSG_TRADED_WITH", a );
 
-    a zs_sound( level.zs.trade_sound );
-    b zs_sound( level.zs.trade_sound );
+    a zshare__zs_sound( level.zs.trade_sound );
+    b zshare__zs_sound( level.zs.trade_sound );
 }
 
 /*
@@ -1098,7 +1099,7 @@ zs_trade_do( a, b )
     reads, and the Alternate Ammo Type, which lives on the player rather
     than on the weapon.
 */
-zs_weapon_record( player, weapon )
+zshare__zs_weapon_record( player, weapon )
 {
     r = spawnstruct();
     r.weapon = weapon;
@@ -1122,7 +1123,7 @@ zs_weapon_record( player, weapon )
     return r;
 }
 
-zs_weapon_take( weapon )
+zshare__zs_weapon_take( weapon )
 {
     if ( isdefined( self aat::getaatonweapon( weapon ) ) )
         self aat::remove( weapon );
@@ -1130,7 +1131,7 @@ zs_weapon_take( weapon )
     self zm_weapons::weapon_take( weapon );
 }
 
-zs_weapon_give( r )
+zshare__zs_weapon_give( r )
 {
     self zm_weapons::weapondata_give( r.data );
 
@@ -1147,7 +1148,7 @@ zs_weapon_give( r )
     have their own slots and their own rules, and the box will not take
     your money for one either.
 */
-zs_untradeable( weapon )
+zshare__zs_untradeable( weapon )
 {
     if ( !isdefined( weapon ) || weapon == level.weaponnone )
         return "MSG_HOLD_WEAPON";
@@ -1175,7 +1176,7 @@ zs_untradeable( weapon )
     half -- the plain gun or the Pack-a-Punched one. The weapon they are
     giving away does not count, since it leaves in the same trade.
 */
-zs_carries_same_family( incoming, outgoing )
+zshare__zs_carries_same_family( incoming, outgoing )
 {
     if ( incoming == outgoing )
         return 0;
@@ -1220,7 +1221,7 @@ zs_carries_same_family( incoming, outgoing )
     the one that is owed; an older unthanked favour is simply replaced,
     because thanking is about the moment rather than a ledger.
 */
-zs_favour_note( from )
+zshare__zs_favour_note( from )
 {
     if ( !isdefined( from ) || !isdefined( self ) || from == self )
         return;
@@ -1232,7 +1233,7 @@ zs_favour_note( from )
     self.zs_favour_at = gettime();
 }
 
-zs_owes_thanks( to )
+zshare__zs_owes_thanks( to )
 {
     if ( !level.zs.thank || !isdefined( to ) )
         return 0;
@@ -1247,42 +1248,42 @@ zs_owes_thanks( to )
 }
 
 // Whoever is owed a thank right now, for the chat word.
-zs_favour_who()
+zshare__zs_favour_who()
 {
     if ( !isdefined( self.zs_favour_from ) )
         return undefined;
 
-    if ( !self zs_owes_thanks( self.zs_favour_from ) )
+    if ( !self zshare__zs_owes_thanks( self.zs_favour_from ) )
         return undefined;
 
     return self.zs_favour_from;
 }
 
-zs_thank( to )
+zshare__zs_thank( to )
 {
-    if ( !zs_pair_ok( self, to ) )
+    if ( !zshare__zs_pair_ok( self, to ) )
         return;
 
     amount = level.zs.thank_amount;
 
     if ( self.score < amount )
     {
-        self zs_deny( "MSG_THANK_NEED", amount );
+        self zshare__zs_deny( "MSG_THANK_NEED", amount );
         return;
     }
 
     self.zs_favour_from = undefined;
 
-    zs_score_set( self, self.score - amount );
-    zs_score_set( to, to.score + amount );
+    zshare__zs_score_set( self, self.score - amount );
+    zshare__zs_score_set( to, to.score + amount );
 
-    self zs_say( "MSG_THANKED", to, amount );
-    to zs_say( "MSG_THANKED_YOU", self, amount );
+    self zshare__zs_say( "MSG_THANKED", to, amount );
+    to zshare__zs_say( "MSG_THANKED_YOU", self, amount );
 
-    self zs_sound( level.zs.points_sound );
-    to zs_sound( level.zs.points_sound );
+    self zshare__zs_sound( level.zs.points_sound );
+    to zshare__zs_sound( level.zs.points_sound );
 
-    zs_debug( "thanks: " + self.name + " -> " + to.name );
+    zshare__zs_debug( "thanks: " + self.name + " -> " + to.name );
 }
 
 /*
@@ -1290,7 +1291,7 @@ zs_thank( to )
     and the amount is always the last word, so a name with spaces in it
     still parses.
 */
-zs_tip( rest )
+zshare__zs_tip( rest )
 {
     if ( !level.zs.thank )
         return;
@@ -1299,7 +1300,7 @@ zs_tip( rest )
 
     if ( parts.size == 0 )
     {
-        self zs_say( "MSG_TIP_USAGE" );
+        self zshare__zs_say( "MSG_TIP_USAGE" );
         return;
     }
 
@@ -1307,7 +1308,7 @@ zs_tip( rest )
 
     if ( amount <= 0 )
     {
-        self zs_say( "MSG_TIP_USAGE" );
+        self zshare__zs_say( "MSG_TIP_USAGE" );
         return;
     }
 
@@ -1321,51 +1322,51 @@ zs_tip( rest )
             else
                 name = name + " " + parts[i];
 
-        to = zs_player_named( name, self );
+        to = zshare__zs_player_named( name, self );
 
         if ( !isdefined( to ) )
             return;
     }
     else
     {
-        to = self zs_favour_who();
+        to = self zshare__zs_favour_who();
 
         if ( !isdefined( to ) )
         {
-            self zs_say( "MSG_TIP_NOBODY", amount );
+            self zshare__zs_say( "MSG_TIP_NOBODY", amount );
             return;
         }
     }
 
-    if ( !zs_pair_ok( self, to ) )
+    if ( !zshare__zs_pair_ok( self, to ) )
         return;
 
     if ( self.score < amount )
     {
-        self zs_deny( "MSG_TIP_ONLY_HAVE", self.score );
+        self zshare__zs_deny( "MSG_TIP_ONLY_HAVE", self.score );
         return;
     }
 
-    zs_score_set( self, self.score - amount );
-    zs_score_set( to, to.score + amount );
+    zshare__zs_score_set( self, self.score - amount );
+    zshare__zs_score_set( to, to.score + amount );
 
-    self zs_say( "MSG_TIPPED", to, amount );
-    to zs_say( "MSG_TIPPED_YOU", self, amount );
+    self zshare__zs_say( "MSG_TIPPED", to, amount );
+    to zshare__zs_say( "MSG_TIPPED_YOU", self, amount );
 
-    self zs_sound( level.zs.points_sound );
-    to zs_sound( level.zs.points_sound );
+    self zshare__zs_sound( level.zs.points_sound );
+    to zshare__zs_sound( level.zs.points_sound );
 
-    zs_debug( "tip: " + self.name + " -> " + to.name + " " + amount );
+    zshare__zs_debug( "tip: " + self.name + " -> " + to.name + " " + amount );
 }
 
 /*
-    The player a typed name means. Case and colour codes are ignored and
+    The player a typed name means. Case and color codes are ignored and
     a prefix is enough, but a name that matches nobody -- or more than
     one -- is refused rather than guessed at: somebody typing a name
     means that player, and sending their points to another is worse than
     doing nothing.
 */
-zs_player_named( name, asker )
+zshare__zs_player_named( name, asker )
 {
     want = tolower( name );
     found = undefined;
@@ -1380,7 +1381,7 @@ zs_player_named( name, asker )
         if ( !isdefined( p ) || p == asker )
             continue;
 
-        theirs = tolower( zs_plain_name( p.name ) );
+        theirs = tolower( zshare__zs_plain_name( p.name ) );
 
         if ( theirs == want )
             return p;
@@ -1396,18 +1397,18 @@ zs_player_named( name, asker )
 
     if ( several )
     {
-        asker zs_say( "MSG_NAME_SEVERAL", name );
+        asker zshare__zs_say( "MSG_NAME_SEVERAL", name );
         return undefined;
     }
 
     if ( !isdefined( found ) )
-        asker zs_say( "MSG_NAME_NOBODY", name );
+        asker zshare__zs_say( "MSG_NAME_NOBODY", name );
 
     return found;
 }
 
-// A name with the colour codes taken out, so typing it plainly matches.
-zs_plain_name( name )
+// A name with the color codes taken out, so typing it plainly matches.
+zshare__zs_plain_name( name )
 {
     out = "";
 
@@ -1425,37 +1426,37 @@ zs_plain_name( name )
     return out;
 }
 
-zs_points_give( to )
+zshare__zs_points_give( to )
 {
     amount = level.zs.points_amount;
 
-    if ( amount <= 0 || !zs_pair_ok( self, to ) )
+    if ( amount <= 0 || !zshare__zs_pair_ok( self, to ) )
         return;
 
-    if ( zs_true( self.zs_points_next ) && gettime() < self.zs_points_next )
+    if ( zshare__zs_true( self.zs_points_next ) && gettime() < self.zs_points_next )
         return;
 
     if ( self.score < amount )
     {
-        self zs_deny( "MSG_POINTS_NEED", amount );
+        self zshare__zs_deny( "MSG_POINTS_NEED", amount );
         return;
     }
 
     self.zs_points_next = gettime() + int( level.zs.points_cooldown * 1000 );
 
-    zs_score_set( self, self.score - amount );
-    zs_score_set( to, to.score + amount );
+    zshare__zs_score_set( self, self.score - amount );
+    zshare__zs_score_set( to, to.score + amount );
 
-    to zs_favour_note( self );
+    to zshare__zs_favour_note( self );
 
-    self zs_say( "MSG_GAVE", to, amount );
-    to zs_say( "MSG_GAVE_YOU", self, amount );
+    self zshare__zs_say( "MSG_GAVE", to, amount );
+    to zshare__zs_say( "MSG_GAVE_YOU", self, amount );
 
-    self zs_sound( level.zs.points_sound );
-    to zs_sound( level.zs.points_sound );
+    self zshare__zs_sound( level.zs.points_sound );
+    to zshare__zs_sound( level.zs.points_sound );
 }
 
-zs_score_set( player, value )
+zshare__zs_score_set( player, value )
 {
     if ( value < 0 )
         value = 0;
@@ -1475,10 +1476,20 @@ zs_score_set( player, value )
     hears everybody.
    ================================================================== */
 
-zs_chat_listener()
+zshare__zs_chat_listener()
 {
     self endon( "disconnect" );
     level endon( "end_game" );
+
+    /*
+        One listener a player, however many copies of ZShare loaded. A
+        ZBundle fastfile and a loose copy both register on_connect, and
+        two listeners would answer every chat word twice.
+    */
+    if ( zshare__zs_true( self.zs_chat_listening ) )
+        return;
+
+    self.zs_chat_listening = 1;
 
     for ( ;; )
     {
@@ -1489,22 +1500,22 @@ zs_chat_listener()
 
         msg = tolower( message );
 
-        if ( zs_word_is( msg, "!thank" ) || zs_word_is( msg, "!t" ) )
+        if ( zshare__zs_word_is( msg, "!thank" ) || zshare__zs_word_is( msg, "!t" ) )
         {
-            self thread zs_chat_thank();
+            self thread zshare__zs_chat_thank();
             continue;
         }
 
-        rest = zs_word_after( msg, "!tip" );
+        rest = zshare__zs_word_after( msg, "!tip" );
 
         if ( isdefined( rest ) )
         {
-            self thread zs_chat_tip( rest );
+            self thread zshare__zs_chat_tip( rest );
             continue;
         }
 
-        if ( zs_word_is( msg, "!share" ) )
-            self thread zs_chat_share();
+        if ( zshare__zs_word_is( msg, "!share" ) )
+            self thread zshare__zs_chat_share();
     }
 }
 
@@ -1517,7 +1528,7 @@ zs_chat_listener()
     What follows a word, or undefined when the message is not that word.
     The same two comparisons zs_word_is makes, for the same reason.
 */
-zs_word_after( msg, token )
+zshare__zs_word_after( msg, token )
 {
     /*
         getsubstr()'s third argument is where to stop, not how many
@@ -1532,16 +1543,16 @@ zs_word_after( msg, token )
         "!tip", and reading its "sy" as an amount is how a chat line
         nobody meant for ZShare reached the tip code.
     */
-    if ( zs_word_starts( msg, 0, token ) )
-        return zs_trim( getsubstr( msg, token.size ) );
+    if ( zshare__zs_word_starts( msg, 0, token ) )
+        return zshare__zs_trim( getsubstr( msg, token.size ) );
 
-    if ( msg.size > 1 && zs_word_starts( msg, 1, token ) )
-        return zs_trim( getsubstr( msg, 1 + token.size ) );
+    if ( msg.size > 1 && zshare__zs_word_starts( msg, 1, token ) )
+        return zshare__zs_trim( getsubstr( msg, 1 + token.size ) );
 
     return undefined;
 }
 
-zs_word_starts( msg, at, token )
+zshare__zs_word_starts( msg, at, token )
 {
     end = at + token.size;
 
@@ -1555,7 +1566,7 @@ zs_word_starts( msg, at, token )
     return msg.size == end || getsubstr( msg, end, end + 1 ) == " ";
 }
 
-zs_trim( s )
+zshare__zs_trim( s )
 {
     while ( s.size > 0 && s[0] == " " )
         s = getsubstr( s, 1 );
@@ -1567,31 +1578,31 @@ zs_trim( s )
 }
 
 // self is the player who typed, because this engine raises say on them.
-zs_chat_thank()
+zshare__zs_chat_thank()
 {
-    zs_load_config();
+    zshare__zs_load_config();
 
     if ( !level.zs.thank )
         return;
 
-    to = self zs_favour_who();
+    to = self zshare__zs_favour_who();
 
     if ( !isdefined( to ) )
     {
-        self zs_say( "MSG_THANK_NOBODY" );
+        self zshare__zs_say( "MSG_THANK_NOBODY" );
         return;
     }
 
-    self zs_thank( to );
+    self zshare__zs_thank( to );
 }
 
-zs_chat_tip( rest )
+zshare__zs_chat_tip( rest )
 {
-    zs_load_config();
-    self zs_tip( rest );
+    zshare__zs_load_config();
+    self zshare__zs_tip( rest );
 }
 
-zs_word_is( msg, token )
+zshare__zs_word_is( msg, token )
 {
     if ( msg == token )
         return 1;
@@ -1607,11 +1618,11 @@ zs_word_is( msg, token )
     one at the Pack-a-Punch. It asks what the crouched press asks, less
     the crouch.
 */
-zs_chat_share()
+zshare__zs_chat_share()
 {
-    zs_load_config();
+    zshare__zs_load_config();
 
-    if ( !zs_player_ok( self ) )
+    if ( !zshare__zs_player_ok( self ) )
         return;
 
     if ( level.zs.box_share && isdefined( level.chests ) )
@@ -1620,10 +1631,10 @@ zs_chat_share()
         {
             chest = level.chests[i];
 
-            if ( !zs_box_shareable( chest, self ) )
+            if ( !zshare__zs_box_shareable( chest, self ) )
                 continue;
 
-            chest zs_box_share( self );
+            chest zshare__zs_box_share( self );
             return;
         }
     }
@@ -1634,15 +1645,15 @@ zs_chat_share()
         {
             trig = level.zs_pap_machines[i];
 
-            if ( !zs_pap_shareable( trig, self ) )
+            if ( !zshare__zs_pap_shareable( trig, self ) )
                 continue;
 
-            trig zs_pap_share( self );
+            trig zshare__zs_pap_share( self );
             return;
         }
     }
 
-    self zs_say( "MSG_NOTHING_WAITING" );
+    self zshare__zs_say( "MSG_NOTHING_WAITING" );
 }
 
 
@@ -1663,7 +1674,7 @@ zs_chat_share()
    ================================================================== */
 
 // Every chest has its stub once treasure_chest_init() has run.
-zs_box_ready()
+zshare__zs_box_ready()
 {
     if ( !isdefined( level.chests ) )
         return 0;
@@ -1680,11 +1691,11 @@ zs_box_ready()
     return 1;
 }
 
-zs_box_hook()
+zshare__zs_box_hook()
 {
     level endon( "end_game" );
 
-    while ( !zs_box_ready() )
+    while ( !zshare__zs_box_ready() )
         wait 0.5;
 
     for ( i = 0; i < level.chests.size; i++ )
@@ -1696,8 +1707,8 @@ zs_box_hook()
 
         stub = chest.unitrigger_stub;
         stub.zs_prompt_stock = stub.prompt_and_visibility_func;
-        stub.prompt_and_visibility_func = ::zs_box_prompt;
-        stub.onspawnfunc = ::zs_box_trigger_spawned;
+        stub.prompt_and_visibility_func = ::zshare__zs_box_prompt;
+        stub.onspawnfunc = ::zshare__zs_box_trigger_spawned;
 
         /*
             A trigger built before the hook went in is still running the
@@ -1717,14 +1728,14 @@ zs_box_hook()
                     continue;
 
                 t notify( "kill_trigger" );
-                t thread zs_box_relay();
+                t thread zshare__zs_box_relay();
             }
         }
 
-        chest thread zs_box_watcher();
+        chest thread zshare__zs_box_watcher();
     }
 
-    zs_debug( "box: hooked " + level.chests.size + " chest(s)" );
+    zshare__zs_debug( "box: hooked " + level.chests.size + " chest(s)" );
 }
 
 /*
@@ -1733,9 +1744,9 @@ zs_box_hook()
     ago; the think thread is started from this field right after this
     returns, so writing ours here is exact.
 */
-zs_box_trigger_spawned( trigger )
+zshare__zs_box_trigger_spawned( trigger )
 {
-    self.trigger_func = ::zs_box_relay;
+    self.trigger_func = ::zshare__zs_box_relay;
 }
 
 /*
@@ -1743,7 +1754,7 @@ zs_box_trigger_spawned( trigger )
     taken out before it forwards the rest. self is the per-player
     trigger.
 */
-zs_box_relay()
+zshare__zs_box_relay()
 {
     self endon( "kill_trigger" );
 
@@ -1753,7 +1764,7 @@ zs_box_relay()
 
         chest = self.stub.trigger_target;
 
-        if ( isdefined( chest ) && isplayer( player ) && zs_box_press( chest, player ) )
+        if ( isdefined( chest ) && isplayer( player ) && zshare__zs_box_press( chest, player ) )
             continue;
 
         self.stub.trigger_target notify( "trigger", player );
@@ -1765,27 +1776,27 @@ zs_box_relay()
     on the prompt come from the same function, so what a player reads is
     always what the press does.
 */
-zs_box_press( chest, player )
+zshare__zs_box_press( chest, player )
 {
-    zs_load_config();
+    zshare__zs_load_config();
 
-    mode = zs_box_mode( chest, player );
+    mode = zshare__zs_box_mode( chest, player );
 
     if ( mode == "share" )
     {
-        chest zs_box_share( player );
+        chest zshare__zs_box_share( player );
         return 1;
     }
 
     if ( mode == "pay" )
     {
-        chest zs_box_pay( player );
+        chest zshare__zs_box_pay( player );
         return 1;
     }
 
     if ( mode == "take_back" )
     {
-        zs_box_take_back( player );
+        zshare__zs_box_take_back( player );
         return 1;
     }
 
@@ -1802,56 +1813,56 @@ zs_box_press( chest, player )
         pay          the box is idle, and you are crouched
         stock        anything else, which the box handles itself
 */
-zs_box_mode( chest, player )
+zshare__zs_box_mode( chest, player )
 {
     if ( !isdefined( chest ) || !isdefined( player ) )
         return "stock";
 
-    crouched = zs_crouched( player );
+    crouched = zshare__zs_crouched( player );
 
-    if ( zs_true( chest.grab_weapon_hint ) )
+    if ( zshare__zs_true( chest.grab_weapon_hint ) )
     {
-        if ( zs_true( chest.zs_shared ) )
+        if ( zshare__zs_true( chest.zs_shared ) )
             return "take_shared";
 
-        if ( level.zs.box_share && crouched && zs_box_shareable( chest, player ) )
+        if ( level.zs.box_share && crouched && zshare__zs_box_shareable( chest, player ) )
             return "share";
 
         return "stock";
     }
 
-    if ( zs_true( chest._box_open ) )
+    if ( zshare__zs_true( chest._box_open ) )
         return "stock";
 
-    if ( zs_true( level.zs_box_paid ) )
+    if ( zshare__zs_true( level.zs_box_paid ) )
     {
         if ( crouched && isdefined( level.zs_box_paid_by ) && level.zs_box_paid_by == player )
             return "take_back";
 
-        if ( zs_true( chest.zs_free ) )
+        if ( zshare__zs_true( chest.zs_free ) )
             return "free";
 
         return "stock";
     }
 
-    if ( crouched && zs_box_pay_allowed( chest, player ) )
+    if ( crouched && zshare__zs_box_pay_allowed( chest, player ) )
         return "pay";
 
     return "stock";
 }
 
-zs_box_shareable( chest, player )
+zshare__zs_box_shareable( chest, player )
 {
     if ( !isdefined( chest ) || !isdefined( player ) )
         return 0;
 
-    if ( !zs_true( chest.grab_weapon_hint ) || zs_true( chest.zs_shared ) )
+    if ( !zshare__zs_true( chest.grab_weapon_hint ) || zshare__zs_true( chest.zs_shared ) )
         return 0;
 
     return isdefined( chest.chest_user ) && chest.chest_user == player;
 }
 
-zs_box_share( player )
+zshare__zs_box_share( player )
 {
     self.box_rerespun = 1;
     self.zs_shared = 1;
@@ -1861,14 +1872,14 @@ zs_box_share( player )
     // wanders in, which is what the stock code does after unlocking.
     self.unitrigger_stub zm_unitrigger::run_visibility_function_for_all_triggers();
 
-    zs_say_all( "MSG_BOX_SHARED", player );
-    zs_sound_others( player, level.zs.share_sound );
+    zshare__zs_say_all( "MSG_BOX_SHARED", player );
+    zshare__zs_sound_others( player, level.zs.share_sound );
 
-    zs_debug( "box shared by " + player.name );
+    zshare__zs_debug( "box shared by " + player.name );
 }
 
 // The box that is actually in play, as opposed to a location it has left.
-zs_box_is_active( chest )
+zshare__zs_box_is_active( chest )
 {
     if ( !isdefined( level.chests ) || !isdefined( level.chest_index ) )
         return 0;
@@ -1879,49 +1890,49 @@ zs_box_is_active( chest )
     return level.chests[level.chest_index] == chest;
 }
 
-zs_fire_sale_on()
+zshare__zs_fire_sale_on()
 {
     if ( !isdefined( level.zombie_vars ) )
         return 0;
 
-    return zs_true( level.zombie_vars["zombie_powerup_fire_sale_on"] );
+    return zshare__zs_true( level.zombie_vars["zombie_powerup_fire_sale_on"] );
 }
 
-zs_box_pay_allowed( chest, player )
+zshare__zs_box_pay_allowed( chest, player )
 {
-    if ( !level.zs.box_pay || !zs_pay_team_check() )
+    if ( !level.zs.box_pay || !zshare__zs_pay_team_check() )
         return 0;
 
-    if ( zs_fire_sale_on() || level flag::get( "moving_chest_now" ) )
+    if ( zshare__zs_fire_sale_on() || level flag::get( "moving_chest_now" ) )
         return 0;
 
-    if ( zs_true( chest.hidden ) || !zs_box_is_active( chest ) )
+    if ( zshare__zs_true( chest.hidden ) || !zshare__zs_box_is_active( chest ) )
         return 0;
 
     // The hacker's summon borrows the same free-spin fields.
     if ( isdefined( chest.forced_user ) )
         return 0;
 
-    if ( isdefined( chest.auto_open ) && !zs_true( chest.zs_free ) )
+    if ( isdefined( chest.auto_open ) && !zshare__zs_true( chest.zs_free ) )
         return 0;
 
     if ( !isdefined( chest.zombie_cost ) )
         return 0;
 
-    return zs_payer_ok( player );
+    return zshare__zs_payer_ok( player );
 }
 
 /*
     Charged through the game's own purchase, so the points leave the way
     they would at any other buy. What was taken is what comes back.
 */
-zs_box_pay( player )
+zshare__zs_box_pay( player )
 {
     cost = self.zombie_cost;
 
     if ( !player zm_score::can_player_purchase( cost ) )
     {
-        player zs_deny( "MSG_NEED_POINTS", cost );
+        player zshare__zs_deny( "MSG_NEED_POINTS", cost );
         return;
     }
 
@@ -1936,7 +1947,7 @@ zs_box_pay( player )
     */
     if ( before - player.score <= 0 )
     {
-        player zs_deny( "MSG_PAY_NOTHING_TAKEN" );
+        player zshare__zs_deny( "MSG_PAY_NOTHING_TAKEN" );
         return;
     }
 
@@ -1944,47 +1955,47 @@ zs_box_pay( player )
     level.zs_box_paid_by = player;
     level.zs_box_paid_amount = before - player.score;
 
-    self zs_box_free_apply();
+    self zshare__zs_box_free_apply();
     self.unitrigger_stub zm_unitrigger::run_visibility_function_for_all_triggers();
 
-    player zs_say( "MSG_BOX_PAID" );
-    zs_say_others( player, "MSG_BOX_PAID_BY", player );
-    player zs_sound( level.zs.points_sound );
-    zs_sound_others( player, level.zs.share_sound );
+    player zshare__zs_say( "MSG_BOX_PAID" );
+    zshare__zs_say_others( player, "MSG_BOX_PAID_BY", player );
+    player zshare__zs_sound( level.zs.points_sound );
+    zshare__zs_sound_others( player, level.zs.share_sound );
 
-    zs_debug( "box paid by " + player.name + ": " + level.zs_box_paid_amount );
+    zshare__zs_debug( "box paid by " + player.name + ": " + level.zs_box_paid_amount );
 }
 
-zs_box_take_back( player )
+zshare__zs_box_take_back( player )
 {
     amount = level.zs_box_paid_amount;
 
-    zs_box_paid_reset();
+    zshare__zs_box_paid_reset();
 
-    zs_refund( player, amount );
+    zshare__zs_refund( player, amount );
 
-    player zs_say( "MSG_BOX_TAKEN_BACK" );
-    zs_say_others( player, "MSG_BOX_TAKEN_BACK_BY", player );
-    player zs_sound( level.zs.points_sound );
+    player zshare__zs_say( "MSG_BOX_TAKEN_BACK" );
+    zshare__zs_say_others( player, "MSG_BOX_TAKEN_BACK_BY", player );
+    player zshare__zs_sound( level.zs.points_sound );
 
-    zs_debug( "box payment taken back" );
+    zshare__zs_debug( "box payment taken back" );
 }
 
 /*
     Points that are being given back rather than earned, so they go onto
     the score directly and count towards nothing.
 */
-zs_refund( player, amount )
+zshare__zs_refund( player, amount )
 {
     if ( !isdefined( player ) || !isdefined( amount ) || amount <= 0 )
         return;
 
-    zs_score_set( player, player.score + amount );
+    zshare__zs_score_set( player, player.score + amount );
 }
 
-zs_box_paid_reset()
+zshare__zs_box_paid_reset()
 {
-    zs_box_paid_clear();
+    zshare__zs_box_paid_clear();
 
     if ( !isdefined( level.chests ) )
         return;
@@ -1996,7 +2007,7 @@ zs_box_paid_reset()
         if ( !isdefined( chest ) )
             continue;
 
-        chest zs_box_free_remove();
+        chest zshare__zs_box_free_remove();
 
         if ( isdefined( chest.unitrigger_stub ) )
             chest.unitrigger_stub zm_unitrigger::run_visibility_function_for_all_triggers();
@@ -2007,9 +2018,9 @@ zs_box_paid_reset()
     Only ever sets fields nobody else is using, and only ever clears the
     ones it set. The hacker's summon leaves its own there while it runs.
 */
-zs_box_free_apply()
+zshare__zs_box_free_apply()
 {
-    if ( zs_true( self.zs_free ) )
+    if ( zshare__zs_true( self.zs_free ) )
         return;
 
     if ( isdefined( self.auto_open ) || isdefined( self.no_charge ) || isdefined( self.forced_user ) )
@@ -2020,9 +2031,9 @@ zs_box_free_apply()
     self.zs_free = 1;
 }
 
-zs_box_free_remove()
+zshare__zs_box_free_remove()
 {
-    if ( !zs_true( self.zs_free ) )
+    if ( !zshare__zs_true( self.zs_free ) )
         return;
 
     self.auto_open = undefined;
@@ -2030,15 +2041,15 @@ zs_box_free_remove()
     self.zs_free = 0;
 }
 
-zs_box_can_be_free( chest )
+zshare__zs_box_can_be_free( chest )
 {
-    if ( zs_fire_sale_on() || level flag::get( "moving_chest_now" ) )
+    if ( zshare__zs_fire_sale_on() || level flag::get( "moving_chest_now" ) )
         return 0;
 
-    if ( zs_true( chest.hidden ) || zs_true( chest._box_open ) )
+    if ( zshare__zs_true( chest.hidden ) || zshare__zs_true( chest._box_open ) )
         return 0;
 
-    return zs_box_is_active( chest );
+    return zshare__zs_box_is_active( chest );
 }
 
 /*
@@ -2054,7 +2065,7 @@ zs_box_can_be_free( chest )
           so a player crouching where they stand would otherwise keep
           reading the old words.
 */
-zs_box_watcher()
+zshare__zs_box_watcher()
 {
     level endon( "end_game" );
 
@@ -2062,23 +2073,23 @@ zs_box_watcher()
     {
         wait 0.1;
 
-        if ( !zs_true( self.grab_weapon_hint ) && zs_true( self.zs_shared ) )
+        if ( !zshare__zs_true( self.grab_weapon_hint ) && zshare__zs_true( self.zs_shared ) )
         {
             self.zs_shared = 0;
             self.zs_shared_by = undefined;
         }
 
-        if ( zs_true( self.zs_free ) && zs_true( self._box_open ) )
+        if ( zshare__zs_true( self.zs_free ) && zshare__zs_true( self._box_open ) )
         {
-            self zs_box_free_remove();
-            self thread zs_box_paid_spun();
+            self zshare__zs_box_free_remove();
+            self thread zshare__zs_box_paid_spun();
         }
-        else if ( zs_true( level.zs_box_paid ) && zs_box_can_be_free( self ) )
-            self zs_box_free_apply();
+        else if ( zshare__zs_true( level.zs_box_paid ) && zshare__zs_box_can_be_free( self ) )
+            self zshare__zs_box_free_apply();
         else
-            self zs_box_free_remove();
+            self zshare__zs_box_free_remove();
 
-        sig = zs_box_signature( self );
+        sig = zshare__zs_box_signature( self );
 
         if ( !isdefined( self.zs_sig ) || self.zs_sig != sig )
         {
@@ -2094,9 +2105,9 @@ zs_box_watcher()
     Everything a player near this box could be reading off it, as one
     string: the box's own state, and who nearby is crouched.
 */
-zs_box_signature( chest )
+zshare__zs_box_signature( chest )
 {
-    sig = "" + zs_true( level.zs_box_paid ) + zs_true( chest.zs_free ) + zs_true( chest.zs_shared ) + zs_true( chest.grab_weapon_hint ) + zs_fire_sale_on();
+    sig = "" + zshare__zs_true( level.zs_box_paid ) + zshare__zs_true( chest.zs_free ) + zshare__zs_true( chest.zs_shared ) + zshare__zs_true( chest.grab_weapon_hint ) + zshare__zs_fire_sale_on();
 
     if ( !isdefined( chest.unitrigger_stub ) || !isdefined( chest.unitrigger_stub.playertrigger ) )
         return sig;
@@ -2114,7 +2125,7 @@ zs_box_signature( chest )
         if ( distancesquared( players[i].origin, chest.origin ) > 40000 )
             continue;
 
-        if ( zs_crouched( players[i] ) )
+        if ( zshare__zs_crouched( players[i] ) )
             sig = sig + "c" + players[i] getentitynumber();
     }
 
@@ -2124,7 +2135,7 @@ zs_box_signature( chest )
 /*
     A paid spin has just been used. self is the box.
 */
-zs_box_paid_spun()
+zshare__zs_box_paid_spun()
 {
     level endon( "end_game" );
 
@@ -2132,16 +2143,16 @@ zs_box_paid_spun()
     amount = level.zs_box_paid_amount;
     user = self.chest_user;
 
-    zs_box_paid_clear();
+    zshare__zs_box_paid_clear();
 
     if ( isdefined( user ) && isdefined( payer ) && user != payer )
     {
-        user zs_say( "MSG_BOX_PAID_FOR_YOU", payer );
-        user zs_favour_note( payer );
-        payer zs_say( "MSG_BOX_USED_YOURS", user );
+        user zshare__zs_say( "MSG_BOX_PAID_FOR_YOU", payer );
+        user zshare__zs_favour_note( payer );
+        payer zshare__zs_say( "MSG_BOX_USED_YOURS", user );
     }
 
-    zs_debug( "paid box spin used" );
+    zshare__zs_debug( "paid box spin used" );
 
     if ( !isdefined( self.zbarrier ) )
         return;
@@ -2159,9 +2170,9 @@ zs_box_paid_spun()
 
     if ( level flag::get( "moving_chest_now" ) && isdefined( payer ) && isdefined( amount ) )
     {
-        zs_refund( payer, amount );
-        payer zs_say( "MSG_BOX_MOVED_REFUND", amount );
-        payer zs_sound( level.zs.points_sound );
+        zshare__zs_refund( payer, amount );
+        payer zshare__zs_say( "MSG_BOX_MOVED_REFUND", amount );
+        payer zshare__zs_sound( level.zs.points_sound );
     }
 }
 
@@ -2170,7 +2181,7 @@ zs_box_paid_spun()
     function decides visibility and writes the stock hint; this rewrites
     the words when ZShare has something else to say.
 */
-zs_box_prompt( player )
+zshare__zs_box_prompt( player )
 {
     can_use = self [[ self.stub.zs_prompt_stock ]]( player );
 
@@ -2178,16 +2189,16 @@ zs_box_prompt( player )
         return can_use;
 
     chest = self.stub.trigger_target;
-    mode = zs_box_mode( chest, player );
+    mode = zshare__zs_box_mode( chest, player );
 
     if ( mode == "take_shared" )
-        zs_hint_set( self, "HINT_TAKE_SHARED" );
+        zshare__zs_hint_set( self, "HINT_TAKE_SHARED" );
     else if ( mode == "share" )
-        zs_hint_set( self, "HINT_SHARE" );
+        zshare__zs_hint_set( self, "HINT_SHARE" );
     else if ( mode == "pay" )
-        zs_hint_set( self, "HINT_BOX_PAY=" + chest.zombie_cost );
+        zshare__zs_hint_set( self, "HINT_BOX_PAY=" + chest.zombie_cost );
     else if ( mode == "take_back" )
-        zs_hint_set( self, "HINT_TAKE_BACK" );
+        zshare__zs_hint_set( self, "HINT_TAKE_BACK" );
     else if ( mode == "free" && isdefined( self.hint_string ) )
         self sethintstring( self.hint_string, 0 );
 
@@ -2217,7 +2228,7 @@ zs_box_prompt( player )
     are the machine's own prompt, saying the machine's own words.
    ================================================================== */
 
-zs_pap_hook()
+zshare__zs_pap_hook()
 {
     level.zs_pap_machines = [];
 
@@ -2236,31 +2247,31 @@ zs_pap_hook()
         if ( !isdefined( trig ) )
             continue;
 
-        trig zs_pap_paid_clear();
+        trig zshare__zs_pap_paid_clear();
         trig.zs_shared = 0;
 
         level.zs_pap_machines[level.zs_pap_machines.size] = trig;
 
-        trig.zs_trigger = trig zs_machine_trigger( "pap" );
-        trig thread zs_pap_price_maintain();
+        trig.zs_trigger = trig zshare__zs_machine_trigger( "pap" );
+        trig thread zshare__zs_pap_price_maintain();
     }
 
-    zs_debug( "pap: found " + level.zs_pap_machines.size + " machine(s)" );
+    zshare__zs_debug( "pap: found " + level.zs_pap_machines.size + " machine(s)" );
 }
 
 /*
     self is the Pack-a-Punch trigger. What a crouched press means here,
     and the words that go with it, both come from this.
 */
-zs_pap_mode( player )
+zshare__zs_pap_mode( player )
 {
-    if ( !isdefined( player ) || !zs_crouched( player ) )
+    if ( !isdefined( player ) || !zshare__zs_crouched( player ) )
         return "none";
 
-    if ( level.zs.pap_share && zs_pap_shareable( self, player ) )
+    if ( level.zs.pap_share && zshare__zs_pap_shareable( self, player ) )
         return "share";
 
-    if ( zs_true( self.zs_paid ) )
+    if ( zshare__zs_true( self.zs_paid ) )
     {
         if ( isdefined( self.zs_paid_by ) && self.zs_paid_by == player )
             return "take_back";
@@ -2268,27 +2279,27 @@ zs_pap_mode( player )
         return "none";
     }
 
-    if ( zs_pap_pay_ok( player ) )
+    if ( zshare__zs_pap_pay_ok( player ) )
         return "pay";
 
     return "none";
 }
 
-zs_pap_press( player )
+zshare__zs_pap_press( player )
 {
-    mode = self zs_pap_mode( player );
+    mode = self zshare__zs_pap_mode( player );
 
     if ( mode == "share" )
-        self zs_pap_share( player );
+        self zshare__zs_pap_share( player );
     else if ( mode == "pay" )
-        self zs_pap_pay( player );
+        self zshare__zs_pap_pay( player );
     else if ( mode == "take_back" )
-        self zs_pap_take_back( player );
+        self zshare__zs_pap_take_back( player );
 }
 
-zs_pap_hint( player )
+zshare__zs_pap_hint( player )
 {
-    mode = self zs_pap_mode( player );
+    mode = self zshare__zs_pap_mode( player );
 
     if ( mode == "share" )
         return "HINT_SHARE";
@@ -2307,12 +2318,12 @@ zs_pap_hint( player )
     the machine's own, set the moment the upgraded weapon is put up and
     cleared the moment the window closes.
 */
-zs_pap_shareable( trig, player )
+zshare__zs_pap_shareable( trig, player )
 {
     if ( !isdefined( trig ) || !isdefined( player ) )
         return 0;
 
-    if ( !trig flag::get( "pap_offering_gun" ) || zs_true( trig.zs_shared ) )
+    if ( !trig flag::get( "pap_offering_gun" ) || zshare__zs_true( trig.zs_shared ) )
         return 0;
 
     return isdefined( trig.pack_player ) && trig.pack_player == player;
@@ -2335,7 +2346,7 @@ zs_pap_shareable( trig, player )
     machine's loop does that on its next pass, a tenth of a second later,
     which is why there is nothing here to fight with.
 */
-zs_pap_share( player )
+zshare__zs_pap_share( player )
 {
     self.zs_shared = 1;
     self.zs_shared_by = player;
@@ -2343,19 +2354,19 @@ zs_pap_share( player )
     level.pack_a_punch.grabbable_by_anyone = 1;
     self.pack_player = undefined;
 
-    self thread zs_pap_window_end();
+    self thread zshare__zs_pap_window_end();
 
-    zs_say_all( "MSG_PAP_SHARED", player );
-    zs_sound_others( player, level.zs.share_sound );
+    zshare__zs_say_all( "MSG_PAP_SHARED", player );
+    zshare__zs_sound_others( player, level.zs.share_sound );
 
-    zs_debug( "pap shared by " + player.name );
+    zshare__zs_debug( "pap shared by " + player.name );
 }
 
 /*
     The three ways the machine's offer window can close, which are the
     three notifies it raises on the trigger itself.
 */
-zs_pap_window_end()
+zshare__zs_pap_window_end()
 {
     self endon( "death" );
     level endon( "end_game" );
@@ -2378,12 +2389,12 @@ zs_pap_window_end()
     the only place the taker's name can be read: the trigger's own copy
     has been cleared by then, by the share or by the machine.
 */
-zs_pap_taken_watch()
+zshare__zs_pap_taken_watch()
 {
     self endon( "disconnect" );
     level endon( "end_game" );
 
-    if ( zs_true( self.zs_pap_watching ) )
+    if ( zshare__zs_true( self.zs_pap_watching ) )
         return;
 
     self.zs_pap_watching = 1;
@@ -2399,21 +2410,21 @@ zs_pap_taken_watch()
         {
             trig = level.zs_pap_machines[i];
 
-            if ( !isdefined( trig ) || !zs_true( trig.zs_shared ) )
+            if ( !isdefined( trig ) || !zshare__zs_true( trig.zs_shared ) )
                 continue;
 
             if ( !isdefined( trig.zs_shared_by ) || trig.zs_shared_by == self )
                 continue;
 
-            trig.zs_shared_by zs_say( "MSG_PAP_TOOK_SHARED", self );
+            trig.zs_shared_by zshare__zs_say( "MSG_PAP_TOOK_SHARED", self );
             break;
         }
     }
 }
 
-zs_pap_pay_ok( player )
+zshare__zs_pap_pay_ok( player )
 {
-    if ( !level.zs.pap_pay || !zs_pay_team_check() )
+    if ( !level.zs.pap_pay || !zshare__zs_pay_team_check() )
         return 0;
 
     // Busy with somebody, or holding a gun for them.
@@ -2423,7 +2434,7 @@ zs_pap_pay_ok( player )
     if ( !isdefined( self.zs_cost ) || self.zs_cost <= 0 )
         return 0;
 
-    return zs_payer_ok( player );
+    return zshare__zs_payer_ok( player );
 }
 
 /*
@@ -2431,13 +2442,13 @@ zs_pap_pay_ok( player )
     charges nothing and its own prompt prints the nothing it charges.
     zs_cost is what the price was, kept so it can be put back.
 */
-zs_pap_pay( player )
+zshare__zs_pap_pay( player )
 {
     cost = self.zs_cost;
 
     if ( !player zm_score::can_player_purchase( cost ) )
     {
-        player zs_deny( "MSG_NEED_POINTS", cost );
+        player zshare__zs_deny( "MSG_NEED_POINTS", cost );
         return;
     }
 
@@ -2452,7 +2463,7 @@ zs_pap_pay( player )
     */
     if ( before - player.score <= 0 )
     {
-        player zs_deny( "MSG_PAY_NOTHING_TAKEN" );
+        player zshare__zs_deny( "MSG_PAY_NOTHING_TAKEN" );
         return;
     }
 
@@ -2463,38 +2474,38 @@ zs_pap_pay( player )
     self.cost = 0;
     self.aat_cost = 0;
 
-    self thread zs_pap_paid_watch();
+    self thread zshare__zs_pap_paid_watch();
 
-    player zs_say( "MSG_PAP_PAID" );
-    zs_say_others( player, "MSG_PAP_PAID_BY", player );
-    player zs_sound( level.zs.points_sound );
-    zs_sound_others( player, level.zs.share_sound );
+    player zshare__zs_say( "MSG_PAP_PAID" );
+    zshare__zs_say_others( player, "MSG_PAP_PAID_BY", player );
+    player zshare__zs_sound( level.zs.points_sound );
+    zshare__zs_sound_others( player, level.zs.share_sound );
 
-    zs_debug( "pap paid by " + player.name + ": " + self.zs_paid_amount );
+    zshare__zs_debug( "pap paid by " + player.name + ": " + self.zs_paid_amount );
 }
 
-zs_pap_take_back( player )
+zshare__zs_pap_take_back( player )
 {
     amount = self.zs_paid_amount;
 
     self notify( "zs_pap_paid_end" );
-    self zs_pap_paid_clear();
-    self zs_pap_price_restore();
+    self zshare__zs_pap_paid_clear();
+    self zshare__zs_pap_price_restore();
 
-    zs_refund( player, amount );
+    zshare__zs_refund( player, amount );
 
-    player zs_say( "MSG_PAP_TAKEN_BACK" );
-    zs_say_others( player, "MSG_PAP_TAKEN_BACK_BY", player );
-    player zs_sound( level.zs.points_sound );
+    player zshare__zs_say( "MSG_PAP_TAKEN_BACK" );
+    zshare__zs_say_others( player, "MSG_PAP_TAKEN_BACK_BY", player );
+    player zshare__zs_sound( level.zs.points_sound );
 
-    zs_debug( "pap payment taken back" );
+    zshare__zs_debug( "pap payment taken back" );
 }
 
 /*
     A paid pack has been used the moment the machine takes somebody on,
     which is pack_player being set to them.
 */
-zs_pap_paid_watch()
+zshare__zs_pap_paid_watch()
 {
     self endon( "death" );
     self endon( "zs_pap_paid_end" );
@@ -2504,35 +2515,35 @@ zs_pap_paid_watch()
     {
         wait 0.1;
 
-        if ( !zs_true( self.zs_paid ) )
+        if ( !zshare__zs_true( self.zs_paid ) )
             return;
 
         if ( !isdefined( self.pack_player ) )
             continue;
 
-        self zs_pap_paid_used( self.pack_player );
+        self zshare__zs_pap_paid_used( self.pack_player );
         return;
     }
 }
 
-zs_pap_paid_used( taker )
+zshare__zs_pap_paid_used( taker )
 {
     payer = self.zs_paid_by;
 
-    self zs_pap_paid_clear();
-    self zs_pap_price_restore();
+    self zshare__zs_pap_paid_clear();
+    self zshare__zs_pap_price_restore();
 
     if ( isdefined( taker ) && isdefined( payer ) && taker != payer )
     {
-        taker zs_say( "MSG_PAP_PAID_FOR_YOU", payer );
-        taker zs_favour_note( payer );
-        payer zs_say( "MSG_PAP_USED_YOURS", taker );
+        taker zshare__zs_say( "MSG_PAP_PAID_FOR_YOU", payer );
+        taker zshare__zs_favour_note( payer );
+        payer zshare__zs_say( "MSG_PAP_USED_YOURS", taker );
     }
 
-    zs_debug( "paid pack used" );
+    zshare__zs_debug( "paid pack used" );
 }
 
-zs_pap_paid_clear()
+zshare__zs_pap_paid_clear()
 {
     self.zs_paid = 0;
     self.zs_paid_by = undefined;
@@ -2545,7 +2556,7 @@ zs_pap_paid_clear()
     while nobody has paid, so a sale that starts or ends mid-payment is
     still put back to the right number.
 */
-zs_pap_price_maintain()
+zshare__zs_pap_price_maintain()
 {
     self endon( "death" );
     level endon( "end_game" );
@@ -2557,7 +2568,7 @@ zs_pap_price_maintain()
         if ( !isdefined( self.cost ) )
             continue;
 
-        if ( !zs_true( self.zs_paid ) )
+        if ( !zshare__zs_true( self.zs_paid ) )
         {
             self.zs_cost = self.cost;
             self.zs_aat_cost = self.aat_cost;
@@ -2575,7 +2586,7 @@ zs_pap_price_maintain()
     }
 }
 
-zs_pap_price_restore()
+zshare__zs_pap_price_restore()
 {
     if ( isdefined( self.zs_cost ) )
         self.cost = self.zs_cost;
@@ -2594,7 +2605,7 @@ zs_pap_price_restore()
     place, shown to one player at a time.
    ================================================================== */
 
-zs_machine_trigger( kind )
+zshare__zs_machine_trigger( kind )
 {
     t = spawn( "trigger_radius_use", self.origin, 0, 72, 96 );
     t setcursorhint( "HINT_NOICON" );
@@ -2608,7 +2619,7 @@ zs_machine_trigger( kind )
     t.zs_hint = "";
     t.zs_viewer = undefined;
 
-    t thread zs_machine_trigger_think();
+    t thread zshare__zs_machine_trigger_think();
 
     if ( !isdefined( level.zs_machine_triggers ) )
         level.zs_machine_triggers = [];
@@ -2621,7 +2632,7 @@ zs_machine_trigger( kind )
 /*
     Shown to one player, with one line of words, or to nobody.
 */
-zs_trigger_show( t, player, want )
+zshare__zs_trigger_show( t, player, want )
 {
     if ( !isdefined( t ) )
         return;
@@ -2639,7 +2650,7 @@ zs_trigger_show( t, player, want )
 
     if ( want != t.zs_hint )
     {
-        zs_hint_set( t, want );
+        zshare__zs_hint_set( t, want );
         t.zs_hint = want;
     }
 
@@ -2654,7 +2665,7 @@ zs_trigger_show( t, player, want )
     }
 }
 
-zs_machine_trigger_think()
+zshare__zs_machine_trigger_think()
 {
     self endon( "death" );
     level endon( "end_game" );
@@ -2669,18 +2680,18 @@ zs_machine_trigger_think()
         if ( !isdefined( self.zs_viewer ) || player != self.zs_viewer )
             continue;
 
-        zs_load_config();
+        zshare__zs_load_config();
 
         machine = self.zs_machine;
 
         switch ( self.zs_kind )
         {
             case "pap":
-                machine zs_pap_press( player );
+                machine zshare__zs_pap_press( player );
                 break;
 
             case "perk":
-                machine zs_perk_press( player );
+                machine zshare__zs_perk_press( player );
                 break;
         }
 
@@ -2697,7 +2708,7 @@ zs_machine_trigger_think()
     keep their own on the trigger.
    ================================================================== */
 
-zs_box_paid_clear()
+zshare__zs_box_paid_clear()
 {
     level.zs_box_paid = 0;
     level.zs_box_paid_by = undefined;
@@ -2717,7 +2728,7 @@ zs_box_paid_clear()
     at the Pack-a-Punch. Taking a paid drink is the machine's own prompt.
    ================================================================== */
 
-zs_perk_hook()
+zshare__zs_perk_hook()
 {
     level.zs_perk_machines = [];
 
@@ -2730,27 +2741,27 @@ zs_perk_hook()
         if ( !isdefined( trig ) || !isdefined( trig.script_noteworthy ) )
             continue;
 
-        trig zs_perk_paid_clear();
+        trig zshare__zs_perk_paid_clear();
 
         level.zs_perk_machines[level.zs_perk_machines.size] = trig;
 
-        trig.zs_trigger = trig zs_machine_trigger( "perk" );
-        trig thread zs_perk_price_maintain();
+        trig.zs_trigger = trig zshare__zs_machine_trigger( "perk" );
+        trig thread zshare__zs_perk_price_maintain();
     }
 
-    zs_debug( "perks: found " + level.zs_perk_machines.size + " machine(s)" );
+    zshare__zs_debug( "perks: found " + level.zs_perk_machines.size + " machine(s)" );
 }
 
 /*
     self is the perk machine's use trigger. script_noteworthy is the perk
     id everywhere in the perk system.
 */
-zs_perk_mode( player )
+zshare__zs_perk_mode( player )
 {
-    if ( !isdefined( player ) || !zs_crouched( player ) )
+    if ( !isdefined( player ) || !zshare__zs_crouched( player ) )
         return "none";
 
-    if ( zs_true( self.zs_paid ) )
+    if ( zshare__zs_true( self.zs_paid ) )
     {
         if ( isdefined( self.zs_paid_by ) && self.zs_paid_by == player )
             return "take_back";
@@ -2758,25 +2769,25 @@ zs_perk_mode( player )
         return "none";
     }
 
-    if ( self zs_perk_pay_ok( player ) )
+    if ( self zshare__zs_perk_pay_ok( player ) )
         return "pay";
 
     return "none";
 }
 
-zs_perk_press( player )
+zshare__zs_perk_press( player )
 {
-    mode = self zs_perk_mode( player );
+    mode = self zshare__zs_perk_mode( player );
 
     if ( mode == "pay" )
-        self zs_perk_pay( player );
+        self zshare__zs_perk_pay( player );
     else if ( mode == "take_back" )
-        self zs_perk_take_back( player );
+        self zshare__zs_perk_take_back( player );
 }
 
-zs_perk_hint( player )
+zshare__zs_perk_hint( player )
 {
-    mode = self zs_perk_mode( player );
+    mode = self zshare__zs_perk_mode( player );
 
     if ( mode == "pay" )
         return "HINT_PERK_PAY=" + self.zs_cost;
@@ -2787,9 +2798,9 @@ zs_perk_hint( player )
     return "";
 }
 
-zs_perk_pay_ok( player )
+zshare__zs_perk_pay_ok( player )
 {
-    if ( !level.zs.perk_pay || !zs_pay_team_check() )
+    if ( !level.zs.perk_pay || !zshare__zs_pay_team_check() )
         return 0;
 
     /*
@@ -2809,16 +2820,16 @@ zs_perk_pay_ok( player )
         Crouching over a downed teammate revives them, and that prompt
         comes first.
     */
-    return zs_payer_ok( player );
+    return zshare__zs_payer_ok( player );
 }
 
-zs_perk_pay( player )
+zshare__zs_perk_pay( player )
 {
     cost = self.zs_cost;
 
     if ( !player zm_score::can_player_purchase( cost ) )
     {
-        player zs_deny( "MSG_NEED_POINTS", cost );
+        player zshare__zs_deny( "MSG_NEED_POINTS", cost );
         return;
     }
 
@@ -2833,7 +2844,7 @@ zs_perk_pay( player )
     */
     if ( before - player.score <= 0 )
     {
-        player zs_deny( "MSG_PAY_NOTHING_TAKEN" );
+        player zshare__zs_deny( "MSG_PAY_NOTHING_TAKEN" );
         return;
     }
 
@@ -2842,30 +2853,30 @@ zs_perk_pay( player )
     self.zs_paid_amount = before - player.score;
 
     self.cost = 0;
-    self zs_perk_hint_price( 0 );
+    self zshare__zs_perk_hint_price( 0 );
 
-    player zs_say( "MSG_PERK_PAID", self.script_noteworthy );
-    zs_say_others( player, "MSG_PERK_PAID_BY", player, self.script_noteworthy );
-    player zs_sound( level.zs.points_sound );
-    zs_sound_others( player, level.zs.share_sound );
+    player zshare__zs_say( "MSG_PERK_PAID", self.script_noteworthy );
+    zshare__zs_say_others( player, "MSG_PERK_PAID_BY", player, self.script_noteworthy );
+    player zshare__zs_sound( level.zs.points_sound );
+    zshare__zs_sound_others( player, level.zs.share_sound );
 
-    zs_debug( "perk paid by " + player.name + ": " + self.zs_paid_amount );
+    zshare__zs_debug( "perk paid by " + player.name + ": " + self.zs_paid_amount );
 }
 
-zs_perk_take_back( player )
+zshare__zs_perk_take_back( player )
 {
     amount = self.zs_paid_amount;
 
-    self zs_perk_paid_clear();
-    self zs_perk_price_restore();
+    self zshare__zs_perk_paid_clear();
+    self zshare__zs_perk_price_restore();
 
-    zs_refund( player, amount );
+    zshare__zs_refund( player, amount );
 
-    player zs_say( "MSG_PERK_TAKEN_BACK", self.script_noteworthy );
-    zs_say_others( player, "MSG_PERK_TAKEN_BACK_BY", player, self.script_noteworthy );
-    player zs_sound( level.zs.points_sound );
+    player zshare__zs_say( "MSG_PERK_TAKEN_BACK", self.script_noteworthy );
+    zshare__zs_say_others( player, "MSG_PERK_TAKEN_BACK_BY", player, self.script_noteworthy );
+    player zshare__zs_sound( level.zs.points_sound );
 
-    zs_debug( "perk payment taken back" );
+    zshare__zs_debug( "perk payment taken back" );
 }
 
 /*
@@ -2874,12 +2885,12 @@ zs_perk_take_back( player )
     machine's own reasons never gets here, and the payment stays where it
     is. Started per player, because that is where the notify lands.
 */
-zs_perk_watch()
+zshare__zs_perk_watch()
 {
     self endon( "disconnect" );
     level endon( "end_game" );
 
-    if ( zs_true( self.zs_perk_watching ) )
+    if ( zshare__zs_true( self.zs_perk_watching ) )
         return;
 
     self.zs_perk_watching = 1;
@@ -2895,7 +2906,7 @@ zs_perk_watch()
         {
             trig = level.zs_perk_machines[i];
 
-            if ( !isdefined( trig ) || !zs_true( trig.zs_paid ) )
+            if ( !isdefined( trig ) || !zshare__zs_true( trig.zs_paid ) )
                 continue;
 
             if ( trig.script_noteworthy != perk )
@@ -2911,30 +2922,30 @@ zs_perk_watch()
             if ( distancesquared( self.origin, trig.origin ) > 10000 )
                 continue;
 
-            trig zs_perk_paid_used( self );
+            trig zshare__zs_perk_paid_used( self );
             break;
         }
     }
 }
 
-zs_perk_paid_used( taker )
+zshare__zs_perk_paid_used( taker )
 {
     payer = self.zs_paid_by;
 
-    self zs_perk_paid_clear();
-    self zs_perk_price_restore();
+    self zshare__zs_perk_paid_clear();
+    self zshare__zs_perk_price_restore();
 
     if ( isdefined( taker ) && isdefined( payer ) && taker != payer )
     {
-        taker zs_say( "MSG_PERK_PAID_FOR_YOU", payer );
-        taker zs_favour_note( payer );
-        payer zs_say( "MSG_PERK_USED_YOURS", taker, self.script_noteworthy );
+        taker zshare__zs_say( "MSG_PERK_PAID_FOR_YOU", payer );
+        taker zshare__zs_favour_note( payer );
+        payer zshare__zs_say( "MSG_PERK_USED_YOURS", taker, self.script_noteworthy );
     }
 
-    zs_debug( "paid perk used" );
+    zshare__zs_debug( "paid perk used" );
 }
 
-zs_perk_paid_clear()
+zshare__zs_perk_paid_clear()
 {
     self.zs_paid = 0;
     self.zs_paid_by = undefined;
@@ -2946,7 +2957,7 @@ zs_perk_paid_clear()
     registry is where the words come from. zs_cost shadows the real price
     so a payment can be put back to the number that was actually taken.
 */
-zs_perk_price_maintain()
+zshare__zs_perk_price_maintain()
 {
     self endon( "death" );
     level endon( "end_game" );
@@ -2958,7 +2969,7 @@ zs_perk_price_maintain()
         if ( !isdefined( self.cost ) )
             continue;
 
-        if ( !zs_true( self.zs_paid ) )
+        if ( !zshare__zs_true( self.zs_paid ) )
         {
             self.zs_cost = self.cost;
             continue;
@@ -2968,25 +2979,25 @@ zs_perk_price_maintain()
         {
             self.zs_cost = self.cost;
             self.cost = 0;
-            self zs_perk_hint_price( 0 );
+            self zshare__zs_perk_hint_price( 0 );
         }
     }
 }
 
-zs_perk_price_restore()
+zshare__zs_perk_price_restore()
 {
     if ( !isdefined( self.zs_cost ) )
         return;
 
     self.cost = self.zs_cost;
-    self zs_perk_hint_price( self.zs_cost );
+    self zshare__zs_perk_hint_price( self.zs_cost );
 }
 
 /*
     The machine's own words with a different number in them, which is
     what a stock prompt at no charge already looks like.
 */
-zs_perk_hint_price( cost )
+zshare__zs_perk_hint_price( cost )
 {
     perk = self.script_noteworthy;
 
@@ -3009,7 +3020,7 @@ zs_perk_hint_price( cost )
     hands out a fifth perk still does with zs_perk_limit set.
    ================================================================== */
 
-zs_perk_limit_apply()
+zshare__zs_perk_limit_apply()
 {
     if ( level.zs.perk_limit == 0 )
         return;
@@ -3017,13 +3028,13 @@ zs_perk_limit_apply()
     if ( isdefined( level.get_player_perk_purchase_limit ) )
         level.zs_perk_limit_stock = level.get_player_perk_purchase_limit;
 
-    level.get_player_perk_purchase_limit = ::zs_perk_limit_get;
+    level.get_player_perk_purchase_limit = ::zshare__zs_perk_limit_get;
 
-    zs_debug( "perk limit: " + level.zs.perk_limit );
+    zshare__zs_debug( "perk limit: " + level.zs.perk_limit );
 }
 
 // self is the player.
-zs_perk_limit_get()
+zshare__zs_perk_limit_get()
 {
     want = level.zs.perk_limit;
 
@@ -3055,11 +3066,11 @@ zs_perk_limit_get()
     after any map that sets its own has had its turn.
    ================================================================== */
 
-zs_late_hooks()
+zshare__zs_late_hooks()
 {
     level endon( "end_game" );
 
-    while ( !zs_game_ready() )
+    while ( !zshare__zs_game_ready() )
         wait 0.5;
 
     // The perk machines are built by perk_machine_spawn_init(), and the
@@ -3067,9 +3078,9 @@ zs_late_hooks()
     // time the first round is under way.
     wait 2;
 
-    zs_pap_hook();
-    zs_perk_hook();
-    zs_perk_limit_apply();
+    zshare__zs_pap_hook();
+    zshare__zs_perk_hook();
+    zshare__zs_perk_limit_apply();
 }
 
 /*
@@ -3077,7 +3088,7 @@ zs_late_hooks()
     who is reading them, so each trigger picks the one crouched player
     near it who has something to read and is shown to them alone.
 */
-zs_machine_updater()
+zshare__zs_machine_updater()
 {
     level endon( "end_game" );
 
@@ -3095,12 +3106,12 @@ zs_machine_updater()
             if ( !isdefined( t ) || !isdefined( t.zs_machine ) )
                 continue;
 
-            zs_machine_update( t );
+            zshare__zs_machine_update( t );
         }
     }
 }
 
-zs_machine_update( t )
+zshare__zs_machine_update( t )
 {
     machine = t.zs_machine;
     best = undefined;
@@ -3112,16 +3123,16 @@ zs_machine_update( t )
     {
         player = players[i];
 
-        if ( !zs_player_ok( player ) || !zs_crouched( player ) )
+        if ( !zshare__zs_player_ok( player ) || !zshare__zs_crouched( player ) )
             continue;
 
         if ( distancesquared( player.origin, t.origin ) > 6400 )
             continue;
 
         if ( t.zs_kind == "pap" )
-            txt = machine zs_pap_hint( player );
+            txt = machine zshare__zs_pap_hint( player );
         else
-            txt = machine zs_perk_hint( player );
+            txt = machine zshare__zs_perk_hint( player );
 
         if ( txt == "" )
             continue;
@@ -3131,10 +3142,10 @@ zs_machine_update( t )
         break;
     }
 
-    zs_trigger_show( t, best, want );
+    zshare__zs_trigger_show( t, best, want );
 
     if ( isdefined( best ) )
-        best zs_machine_prompt_hold();
+        best zshare__zs_machine_prompt_hold();
 }
 
 /*
@@ -3156,7 +3167,7 @@ zs_machine_update( t )
     while it is true, which is what a crouched press here means anyway: it
     is ZShare's, not the machine's.
 */
-zs_machine_prompt_hold()
+zshare__zs_machine_prompt_hold()
 {
     self.rt_time = gettime();
     self.in_rt_cached = 1;
@@ -3172,15 +3183,15 @@ zs_machine_prompt_hold()
     arguments for it, and ends in zs_tell() in the TEXT block, which knows
     what the words are in the build it is part of.
 */
-zs_say( key, a, b )
+zshare__zs_say( key, a, b )
 {
     if ( !level.zs.messages || !isdefined( self ) )
         return;
 
-    self zs_tell( key, a, b );
+    self zshare__zs_tell( key, a, b );
 }
 
-zs_say_all( key, a, b )
+zshare__zs_say_all( key, a, b )
 {
     if ( !level.zs.messages )
         return;
@@ -3190,11 +3201,11 @@ zs_say_all( key, a, b )
     for ( i = 0; i < players.size; i++ )
     {
         if ( isdefined( players[i] ) )
-            players[i] zs_tell( key, a, b );
+            players[i] zshare__zs_tell( key, a, b );
     }
 }
 
-zs_say_others( except, key, a, b )
+zshare__zs_say_others( except, key, a, b )
 {
     if ( !level.zs.messages )
         return;
@@ -3209,11 +3220,11 @@ zs_say_others( except, key, a, b )
         if ( isdefined( except ) && players[i] == except )
             continue;
 
-        players[i] zs_tell( key, a, b );
+        players[i] zshare__zs_tell( key, a, b );
     }
 }
 
-zs_sound( alias )
+zshare__zs_sound( alias )
 {
     if ( !isdefined( alias ) || alias == "" || !isdefined( self ) )
         return;
@@ -3221,7 +3232,7 @@ zs_sound( alias )
     self playlocalsound( alias );
 }
 
-zs_sound_others( except, alias )
+zshare__zs_sound_others( except, alias )
 {
     if ( !isdefined( alias ) || alias == "" )
         return;
@@ -3240,15 +3251,15 @@ zs_sound_others( except, alias )
     }
 }
 
-zs_deny( key, a, b )
+zshare__zs_deny( key, a, b )
 {
-    self zs_say( key, a, b );
-    self zs_sound( level.zs.deny_sound );
+    self zshare__zs_say( key, a, b );
+    self zshare__zs_sound( level.zs.deny_sound );
 }
 
-zs_debug( txt )
+zshare__zs_debug( txt )
 {
-    if ( !isdefined( level.zs ) || !zs_true( level.zs.debug ) )
+    if ( !isdefined( level.zs ) || !zshare__zs_true( level.zs.debug ) )
         return;
 
     players = getplayers();
@@ -3257,7 +3268,7 @@ zs_debug( txt )
         players[0] iprintln( "^5[zs]^7 " + txt );
 }
 
-zs_game_ready()
+zshare__zs_game_ready()
 {
     return isdefined( level.round_number );
 }
@@ -3281,9 +3292,9 @@ zs_game_ready()
     carries the same functions over localized strings instead, so each
     player there reads their own language.
 */
-zs_tell( key, a, b )
+zshare__zs_tell( key, a, b )
 {
-    txt = zs_text( key, a, b );
+    txt = zshare__zs_text( key, a, b );
 
     if ( txt != "" )
         self iprintln( txt );
@@ -3294,13 +3305,13 @@ zs_tell( key, a, b )
     can compare it with what the trigger already shows before sending it
     again: "HINT_X" or "HINT_X=950".
 */
-zs_hint_key( want )
+zshare__zs_hint_key( want )
 {
     parts = strtok( want, "=" );
     return parts[0];
 }
 
-zs_hint_arg( want )
+zshare__zs_hint_arg( want )
 {
     parts = strtok( want, "=" );
 
@@ -3310,7 +3321,7 @@ zs_hint_arg( want )
     return int( parts[1] );
 }
 
-zs_hint_set( trigger, want )
+zshare__zs_hint_set( trigger, want )
 {
     if ( want == "" )
     {
@@ -3318,10 +3329,10 @@ zs_hint_set( trigger, want )
         return;
     }
 
-    trigger sethintstring( zs_text( zs_hint_key( want ), zs_hint_arg( want ) ) );
+    trigger sethintstring( zshare__zs_text( zshare__zs_hint_key( want ), zshare__zs_hint_arg( want ) ) );
 }
 
-zs_text_player( player )
+zshare__zs_text_player( player )
 {
     if ( isdefined( player ) && isdefined( player.name ) )
         return player.name;
@@ -3329,7 +3340,7 @@ zs_text_player( player )
     return "Someone";
 }
 
-zs_text_perk( perk )
+zshare__zs_text_perk( perk )
 {
     if ( !isdefined( perk ) )
         return "a perk";
@@ -3364,7 +3375,7 @@ zs_text_perk( perk )
     return "a perk";
 }
 
-zs_text( key, a, b )
+zshare__zs_text( key, a, b )
 {
     if ( key == "" )
         return "";
@@ -3384,33 +3395,33 @@ zs_text( key, a, b )
     if ( key == "HINT_TRADE" )
         return "Hold ^3[{+activate}]^7 to trade weapons";
     if ( key == "MSG_OFFER_SENT" )
-        return "Offered your weapon to ^3" + zs_text_player( a ) + "^7 -- they have " + b + " seconds to accept";
+        return "Offered your weapon to ^3" + zshare__zs_text_player( a ) + "^7 -- they have " + b + " seconds to accept";
     if ( key == "MSG_OFFER_RECEIVED" )
-        return "^3" + zs_text_player( a ) + "^7 wants to trade weapons -- look at them and press ^3use^7 to accept";
+        return "^3" + zshare__zs_text_player( a ) + "^7 wants to trade weapons -- look at them and press ^3use^7 to accept";
     if ( key == "MSG_TRADE_CANCELLED" )
         return "Trade cancelled";
     if ( key == "MSG_TRADE_CANCELLED_BY" )
-        return "^3" + zs_text_player( a ) + "^7 cancelled the trade";
+        return "^3" + zshare__zs_text_player( a ) + "^7 cancelled the trade";
     if ( key == "MSG_OFFER_LAPSED" )
         return "Your trade offer lapsed";
     if ( key == "MSG_OFFER_LAPSED_BY" )
-        return "^3" + zs_text_player( a ) + "^7's trade offer lapsed";
+        return "^3" + zshare__zs_text_player( a ) + "^7's trade offer lapsed";
     if ( key == "MSG_TRADE_PUT_AWAY" )
         return "Trade cancelled -- you put the weapon away";
     if ( key == "MSG_TRADE_PUT_AWAY_BY" )
-        return "^3" + zs_text_player( a ) + "^7 put the weapon away -- trade cancelled";
+        return "^3" + zshare__zs_text_player( a ) + "^7 put the weapon away -- trade cancelled";
     if ( key == "MSG_TRADE_TOO_FAR" )
         return "Trade cancelled -- too far apart";
     if ( key == "MSG_TRADE_TOO_FAR_BY" )
-        return "^3" + zs_text_player( a ) + "^7's trade offer lapsed -- too far apart";
+        return "^3" + zshare__zs_text_player( a ) + "^7's trade offer lapsed -- too far apart";
     if ( key == "MSG_TRADE_WITHDRAWN_BY" )
-        return "^3" + zs_text_player( a ) + "^7 withdrew the trade";
+        return "^3" + zshare__zs_text_player( a ) + "^7 withdrew the trade";
     if ( key == "MSG_ALREADY_HAVE" )
         return "You already have that weapon";
     if ( key == "MSG_ALREADY_CARRIES" )
-        return "^3" + zs_text_player( a ) + "^7 already carries that weapon";
+        return "^3" + zshare__zs_text_player( a ) + "^7 already carries that weapon";
     if ( key == "MSG_TRADED_WITH" )
-        return "Traded weapons with ^3" + zs_text_player( a );
+        return "Traded weapons with ^3" + zshare__zs_text_player( a );
     if ( key == "MSG_HOLD_WEAPON" )
         return "Hold the weapon you want to trade";
     if ( key == "MSG_NOT_TRADEABLE" )
@@ -3420,9 +3431,9 @@ zs_text( key, a, b )
     if ( key == "MSG_THANK_NEED" )
         return "You need " + a + " points to thank them";
     if ( key == "MSG_THANKED" )
-        return "Thanked ^3" + zs_text_player( a ) + "^7 -- " + b + " points";
+        return "Thanked ^3" + zshare__zs_text_player( a ) + "^7 -- " + b + " points";
     if ( key == "MSG_THANKED_YOU" )
-        return "^3" + zs_text_player( a ) + "^7 thanked you -- " + b + " points";
+        return "^3" + zshare__zs_text_player( a ) + "^7 thanked you -- " + b + " points";
     if ( key == "MSG_THANK_NOBODY" )
         return "Nobody has done you a good turn just now";
     if ( key == "MSG_TIP_USAGE" )
@@ -3432,9 +3443,9 @@ zs_text( key, a, b )
     if ( key == "MSG_TIP_ONLY_HAVE" )
         return "You only have " + a + " points";
     if ( key == "MSG_TIPPED" )
-        return "Tipped ^3" + zs_text_player( a ) + "^7 " + b + " points";
+        return "Tipped ^3" + zshare__zs_text_player( a ) + "^7 " + b + " points";
     if ( key == "MSG_TIPPED_YOU" )
-        return "^3" + zs_text_player( a ) + "^7 tipped you " + b + " points";
+        return "^3" + zshare__zs_text_player( a ) + "^7 tipped you " + b + " points";
     if ( key == "MSG_NAME_SEVERAL" )
         return "More than one player starts with ^3" + a + "^7";
     if ( key == "MSG_NAME_NOBODY" )
@@ -3442,9 +3453,9 @@ zs_text( key, a, b )
     if ( key == "MSG_POINTS_NEED" )
         return "You need " + a + " points to give";
     if ( key == "MSG_GAVE" )
-        return "Gave ^3" + zs_text_player( a ) + "^7 " + b + " points";
+        return "Gave ^3" + zshare__zs_text_player( a ) + "^7 " + b + " points";
     if ( key == "MSG_GAVE_YOU" )
-        return "^3" + zs_text_player( a ) + "^7 gave you " + b + " points";
+        return "^3" + zshare__zs_text_player( a ) + "^7 gave you " + b + " points";
     if ( key == "MSG_NOTHING_WAITING" )
         return "Nothing of yours is waiting at the box or the Pack-a-Punch";
     if ( key == "MSG_PAY_NOTHING_TAKEN" )
@@ -3460,53 +3471,53 @@ zs_text( key, a, b )
     if ( key == "HINT_BOX_PAY" )
         return "Hold ^3[{+activate}]^7 to buy a spin for a teammate [Cost: " + a + "]";
     if ( key == "MSG_BOX_SHARED" )
-        return "^3" + zs_text_player( a ) + "^7 shared their box weapon -- anyone can take it";
+        return "^3" + zshare__zs_text_player( a ) + "^7 shared their box weapon -- anyone can take it";
     if ( key == "MSG_BOX_PAID" )
         return "Paid for the next box spin -- the next teammate to use the box spins free";
     if ( key == "MSG_BOX_PAID_BY" )
-        return "^3" + zs_text_player( a ) + "^7 paid for the next box spin -- use the box to spin free";
+        return "^3" + zshare__zs_text_player( a ) + "^7 paid for the next box spin -- use the box to spin free";
     if ( key == "MSG_BOX_TAKEN_BACK" )
         return "Took back your payment for the box";
     if ( key == "MSG_BOX_TAKEN_BACK_BY" )
-        return "^3" + zs_text_player( a ) + "^7 took back their payment for the box";
+        return "^3" + zshare__zs_text_player( a ) + "^7 took back their payment for the box";
     if ( key == "MSG_BOX_PAID_FOR_YOU" )
-        return "^3" + zs_text_player( a ) + "^7 paid for this spin";
+        return "^3" + zshare__zs_text_player( a ) + "^7 paid for this spin";
     if ( key == "MSG_BOX_USED_YOURS" )
-        return "^3" + zs_text_player( a ) + "^7 used the spin you paid for";
+        return "^3" + zshare__zs_text_player( a ) + "^7 used the spin you paid for";
     if ( key == "MSG_BOX_MOVED_REFUND" )
         return "The box moved -- your " + a + " points came back";
     if ( key == "HINT_PAP_PAY" )
         return "Hold ^3[{+activate}]^7 to buy a Pack-a-Punch for a teammate [Cost: " + a + "]";
     if ( key == "MSG_PAP_SHARED" )
-        return "^3" + zs_text_player( a ) + "^7 shared their Pack-a-Punched weapon -- anyone can take it";
+        return "^3" + zshare__zs_text_player( a ) + "^7 shared their Pack-a-Punched weapon -- anyone can take it";
     if ( key == "MSG_PAP_TOOK_SHARED" )
-        return "^3" + zs_text_player( a ) + "^7 took the weapon you shared";
+        return "^3" + zshare__zs_text_player( a ) + "^7 took the weapon you shared";
     if ( key == "MSG_PAP_PAID" )
         return "Paid for the next Pack-a-Punch -- the next teammate to use the machine packs free";
     if ( key == "MSG_PAP_PAID_BY" )
-        return "^3" + zs_text_player( a ) + "^7 paid for the next Pack-a-Punch -- use the machine to pack free";
+        return "^3" + zshare__zs_text_player( a ) + "^7 paid for the next Pack-a-Punch -- use the machine to pack free";
     if ( key == "MSG_PAP_TAKEN_BACK" )
         return "Took back your payment for the Pack-a-Punch";
     if ( key == "MSG_PAP_TAKEN_BACK_BY" )
-        return "^3" + zs_text_player( a ) + "^7 took back their payment for the Pack-a-Punch";
+        return "^3" + zshare__zs_text_player( a ) + "^7 took back their payment for the Pack-a-Punch";
     if ( key == "MSG_PAP_PAID_FOR_YOU" )
-        return "^3" + zs_text_player( a ) + "^7 paid for this Pack-a-Punch";
+        return "^3" + zshare__zs_text_player( a ) + "^7 paid for this Pack-a-Punch";
     if ( key == "MSG_PAP_USED_YOURS" )
-        return "^3" + zs_text_player( a ) + "^7 used the Pack-a-Punch you paid for";
+        return "^3" + zshare__zs_text_player( a ) + "^7 used the Pack-a-Punch you paid for";
     if ( key == "HINT_PERK_PAY" )
         return "Hold ^3[{+activate}]^7 to buy this perk for a teammate [Cost: " + a + "]";
     if ( key == "MSG_PERK_PAID" )
-        return "Paid for " + zs_text_perk( a ) + " -- the next teammate to use the machine drinks it free";
+        return "Paid for " + zshare__zs_text_perk( a ) + " -- the next teammate to use the machine drinks it free";
     if ( key == "MSG_PERK_PAID_BY" )
-        return "^3" + zs_text_player( a ) + "^7 paid for " + zs_text_perk( b ) + " -- use the machine to drink it free";
+        return "^3" + zshare__zs_text_player( a ) + "^7 paid for " + zshare__zs_text_perk( b ) + " -- use the machine to drink it free";
     if ( key == "MSG_PERK_TAKEN_BACK" )
-        return "Took back your payment for " + zs_text_perk( a );
+        return "Took back your payment for " + zshare__zs_text_perk( a );
     if ( key == "MSG_PERK_TAKEN_BACK_BY" )
-        return "^3" + zs_text_player( a ) + "^7 took back their payment for " + zs_text_perk( b );
+        return "^3" + zshare__zs_text_player( a ) + "^7 took back their payment for " + zshare__zs_text_perk( b );
     if ( key == "MSG_PERK_PAID_FOR_YOU" )
-        return "^3" + zs_text_player( a ) + "^7 paid for this one";
+        return "^3" + zshare__zs_text_player( a ) + "^7 paid for this one";
     if ( key == "MSG_PERK_USED_YOURS" )
-        return "^3" + zs_text_player( a ) + "^7 used your payment for " + zs_text_perk( b );
+        return "^3" + zshare__zs_text_player( a ) + "^7 used your payment for " + zshare__zs_text_perk( b );
 
     return key;
 }
@@ -3532,10 +3543,10 @@ zs_text( key, a, b )
     what the descriptor carries for another mod to read. Written by
     tools/build.py between the markers; never edit it by hand.
 */
-zs_version()
+zshare__zs_version()
 {
     // ZS_VERSION_BEGIN
-    return "1.3";
+    return "1.4";
     // ZS_VERSION_END
 }
 
@@ -3544,7 +3555,7 @@ zs_version()
     another mod may have made it first, and replacing the array would be
     that mod's entry gone.
 */
-zs_api_register( benabled )
+zshare__zs_api_register( benabled )
 {
     if ( !isdefined( level.zmods ) )
         level.zmods = [];
@@ -3556,14 +3567,14 @@ zs_api_register( benabled )
 
     mod.id = "zshare";
     mod.display_name = "ZShare";
-    mod.version = zs_version();
+    mod.version = zshare__zs_version();
     mod.api_version = 1;
     mod.settings_manifest_version = 1;
     mod.enabled = benabled;
 
-    mod.reload_config = &zs_api_reload_config;
-    mod.get_stock_perk_limit = &zs_api_stock_perk_limit;
-    mod.get_effective_perk_limit = &zs_api_effective_perk_limit;
+    mod.reload_config = &zshare__zs_api_reload_config;
+    mod.get_stock_perk_limit = &zshare__zs_api_stock_perk_limit;
+    mod.get_effective_perk_limit = &zshare__zs_api_effective_perk_limit;
 }
 
 /*
@@ -3571,12 +3582,12 @@ zs_api_register( benabled )
     ZShare's dvars and wants it to count now rather than at the next
     press. 1 when there was something to read.
 */
-zs_api_reload_config()
+zshare__zs_api_reload_config()
 {
-    if ( !zs_true( level.zs_loaded ) || !isdefined( level.zs ) || !level.zs.enabled )
+    if ( !zshare__zs_true( level.zs_loaded ) || !isdefined( level.zs ) || !level.zs.enabled )
         return 0;
 
-    zs_load_config();
+    zshare__zs_load_config();
     return 1;
 }
 
@@ -3585,7 +3596,7 @@ zs_api_reload_config()
     callback ZShare kept before installing its own, which on a map that
     sets one is that map's and includes the slots it adds.
 */
-zs_api_stock_perk_limit( player )
+zshare__zs_api_stock_perk_limit( player )
 {
     if ( !isdefined( player ) )
         return 0;
@@ -3605,15 +3616,15 @@ zs_api_stock_perk_limit( player )
     no override at all while zs_perk_limit is 0, and the honest answer then
     is the map's own.
 */
-zs_api_effective_perk_limit( player )
+zshare__zs_api_effective_perk_limit( player )
 {
     if ( !isdefined( player ) )
         return 0;
 
-    if ( !zs_true( level.zs_loaded ) || !isdefined( level.zs ) || level.zs.perk_limit == 0 )
-        return zs_api_stock_perk_limit( player );
+    if ( !zshare__zs_true( level.zs_loaded ) || !isdefined( level.zs ) || level.zs.perk_limit == 0 )
+        return zshare__zs_api_stock_perk_limit( player );
 
-    return player zs_perk_limit_get();
+    return player zshare__zs_perk_limit_get();
 }
 
 
@@ -3629,16 +3640,16 @@ zs_api_effective_perk_limit( player )
     Written by tools/build.py. The line between the markers is generated;
     do not edit it by hand.
 */
-zs_build()
+zshare__zs_build()
 {
     // ZS_BUILD_BEGIN
     return "";
     // ZS_BUILD_END
 }
 
-zs_cfg_echo( dvar, value, def )
+zshare__zs_cfg_echo( dvar, value, def )
 {
-    if ( !zs_true( level.zs_cfg_echo ) )
+    if ( !zshare__zs_true( level.zs_cfg_echo ) )
         return value;
 
     if ( isdefined( level.zs_cfg_host ) && value != ( "" + def ) )
@@ -3647,14 +3658,14 @@ zs_cfg_echo( dvar, value, def )
     return value;
 }
 
-zs_config_watcher()
+zshare__zs_config_watcher()
 {
     level endon( "end_game" );
 
     for ( ;; )
     {
         wait 5;
-        zs_load_config();
+        zshare__zs_load_config();
     }
 }
 
@@ -3662,7 +3673,7 @@ zs_config_watcher()
     "set zs_config_print 1" in the console prints every setting that is
     not at its default to the host's screen, then puts the switch back.
 */
-zs_config_printer()
+zshare__zs_config_printer()
 {
     level endon( "end_game" );
 
@@ -3688,7 +3699,7 @@ zs_config_printer()
             level.zs_cfg_host iprintln( "^3[ZShare]^7 settings changed from default:" );
 
         level.zs_cfg_echo = 1;
-        zs_load_config();
+        zshare__zs_load_config();
         level.zs_cfg_echo = 0;
 
         if ( isdefined( level.zs_cfg_host ) )
@@ -3698,16 +3709,16 @@ zs_config_printer()
     }
 }
 
-zs_build_watermark()
+zshare__zs_build_watermark()
 {
     level endon( "end_game" );
 
-    stamp = zs_build();
+    stamp = zshare__zs_build();
 
     if ( stamp == "" )
         return;
 
-    while ( !zs_game_ready() )
+    while ( !zshare__zs_game_ready() )
         wait 0.5;
 
     if ( isdefined( level.zs_build_hud ) )
@@ -3728,7 +3739,8 @@ zs_build_watermark()
     e.alpha = 0.7;
     // Which copy drew it, so a test of one against the other can be read
     // off the screen rather than guessed at.
-    e settext( stamp + "  [" + zs_origin() + "]" );
+    e settext( stamp + "  [" + zshare__zs_origin() + "]" );
 
     level.zs_build_hud = e;
 }
+// ===== END ZSHARE =====

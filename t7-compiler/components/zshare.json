@@ -1,0 +1,12 @@
+{
+  "format": 2,
+  "id": "zshare",
+  "source": "src/forks/t7/zshare.gsc",
+  "sourceSha256": "8c8df0da8314eaf40e544143da51a073ea2e75092474babf8ff604227d7296ff",
+  "sourceNamespace": "zshare",
+  "functionCount": 145,
+  "generatedPrefix": "zshare__",
+  "generatedSourceSha256": "f2cf5fcc2cd93ea35452c395da62094415d4ae17af37ad8939b3f825c55ebcfd",
+  "injectionTarget": "scripts/shared/duplicaterender_mgr.gsc",
+  "namespace": "zbundle"
+}

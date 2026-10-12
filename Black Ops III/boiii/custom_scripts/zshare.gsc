@@ -1,6 +1,6 @@
 /*
 ======================================================================
-    ZSHARE T7 v1.3  --  Weapon sharing for Black Ops III Zombies
+    ZSHARE T7 v1.4  --  Weapon sharing for Black Ops III Zombies
 
     by Xep
 
@@ -54,8 +54,6 @@
     bottom, which is generated from zshare-text.json. The loose builds
     carry it in English; the Workshop build carries the same keys over
     localized strings, so each player reads their own language.
-
-    docs/porting-t7.md in the project has the detail.
 
 ----------------------------------------------------------------------
     VERIFICATION
@@ -1359,7 +1357,7 @@ zs_tip( rest )
 }
 
 /*
-    The player a typed name means. Case and colour codes are ignored and
+    The player a typed name means. Case and color codes are ignored and
     a prefix is enough, but a name that matches nobody -- or more than
     one -- is refused rather than guessed at: somebody typing a name
     means that player, and sending their points to another is worse than
@@ -1406,7 +1404,7 @@ zs_player_named( name, asker )
     return found;
 }
 
-// A name with the colour codes taken out, so typing it plainly matches.
+// A name with the color codes taken out, so typing it plainly matches.
 zs_plain_name( name )
 {
     out = "";
@@ -1479,6 +1477,16 @@ zs_chat_listener()
 {
     self endon( "disconnect" );
     level endon( "end_game" );
+
+    /*
+        One listener a player, however many copies of ZShare loaded. A
+        ZBundle fastfile and a loose copy both register on_connect, and
+        two listeners would answer every chat word twice.
+    */
+    if ( zs_true( self.zs_chat_listening ) )
+        return;
+
+    self.zs_chat_listening = 1;
 
     for ( ;; )
     {
@@ -3535,7 +3543,7 @@ zs_text( key, a, b )
 zs_version()
 {
     // ZS_VERSION_BEGIN
-    return "1.3";
+    return "1.4";
     // ZS_VERSION_END
 }
 

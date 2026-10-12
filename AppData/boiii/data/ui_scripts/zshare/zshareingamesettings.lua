@@ -56,6 +56,34 @@ P.IsOurs = function ( item, value )
 	return ok and text == Z.Title()
 end
 
+-- Whether this player is the host, for a host's action. The shared answer
+-- where there is one, failing closed on UNKNOWN; this page's own host test
+-- where a registry this old has none.
+P.AmHost = function ( controller )
+	if B.HostStatus ~= nil then
+		local ok, status = pcall( B.HostStatus, controller )
+		return ok and status == "HOST"
+	end
+	if Z == nil or type( Z.IsHost ) ~= "function" then
+		return false
+	end
+	local ok, host = pcall( Z.IsHost, controller )
+	return ok and host == true
+end
+
+-- The actions this player is drawn. A player's action is every player's;
+-- any other is a host's press and is drawn for the host alone. The press
+-- asks again.
+P.ActionsFor = function ( controller, amHost )
+	local out = {}
+	for _, entry in ipairs( B.GetActions( controller ) ) do
+		if entry.authority == "player" or amHost then
+			out[#out + 1] = entry
+		end
+	end
+	return out
+end
+
 -- An action's own press. The action is looked up by id when it is pressed
 -- rather than held in the handler: a mod may have corrected its own
 -- registration since the menu was built, and what the player pressed is the
@@ -70,6 +98,12 @@ P.Press = function ( id )
 			return
 		end
 		if not B.ActionEnabled( action, controller ) then
+			return
+		end
+		-- Authority again at the press, not only when the row was drawn: host
+		-- status can change with the menu open, and a host's action is never
+		-- a client's to fire.
+		if action.authority ~= "player" and not P.AmHost( controller ) then
 			return
 		end
 		pcall( action.action, controller, action, menu )
@@ -104,11 +138,10 @@ P.Install = function ()
 	source.prepare = function ( controller, list, filter )
 		prepare( controller, list, filter )
 		pcall( function ()
-			-- The host always. A client when the screen holds something of
-			-- theirs, which standalone ZShare never has and a bundle can --
-			-- the row is drawn by whichever Z mod loaded first, so hiding it
-			-- here hides somebody else's personal rows along with ZShare's.
-			if list == nil or not CoD.isZombie or not Z.EntryVisible( controller ) then
+			-- Any zombies match: the actions go by their own authority, and a
+			-- player's action is every player's whether or not they have a
+			-- setting row (ZStats' HUD toggle was missing for such a client).
+			if list == nil or not CoD.isZombie then
 				return
 			end
 			local name = list.customDataSourceHelper
@@ -127,10 +160,10 @@ P.Install = function ()
 			-- The actions first, so the pause sits directly under RESUME
 			-- GAME where a player looking for it would reach for it.
 			if Z.DrawsActionRows() then
-				for _, entry in ipairs( B.GetActions( controller ) ) do
+				for _, entry in ipairs( P.ActionsFor( controller, P.AmHost( controller ) ) ) do
 					local action = Engine.CreateModel( root, "zshareAction_" .. entry.id )
 					Engine.SetModelValue( Engine.CreateModel( action, "displayText" ),
-						B.ActionLabel( entry, controller ) )
+						Z.ActionWords( entry, controller ) )
 					Engine.SetModelValue( Engine.CreateModel( action, "action" ), P.Press( entry.id ) )
 					table.insert( items, at, {
 						model = action,
@@ -141,7 +174,12 @@ P.Install = function ()
 					at = at + 1
 				end
 			end
-			if not Z.DrawsSettingsRow() then
+			-- The settings row: the host always, a client when the screen holds
+			-- something of theirs, which standalone ZShare never has and a
+			-- bundle can -- the row is drawn by whichever Z mod loaded first, so
+			-- hiding it here hides somebody else's personal rows along with
+			-- ZShare's.
+			if not Z.DrawsSettingsRow() or not Z.EntryVisible( controller ) then
 				return
 			end
 			local row = Engine.CreateModel( root, "zshareSettings" )
