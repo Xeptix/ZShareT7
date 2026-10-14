@@ -463,6 +463,11 @@ folders, Black Ops 4's mod folder - with one installer that asks which of them t
 
 ## Changelog
 
+### v1.5
+
+- **The category strip stays where it was** when you change a setting: the category you are on
+  keeps its place on the strip instead of jumping to the end of it.
+
 ### v1.4
 
 - **The settings page speaks your language** on every route, the loose clients included, in

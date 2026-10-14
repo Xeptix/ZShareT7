@@ -4,7 +4,7 @@
 // ===== BEGIN ZSHARE =====
 /*
 ======================================================================
-    ZSHARE T7 v1.4  --  Weapon sharing for Black Ops III Zombies
+    ZSHARE T7 v1.5  --  Weapon sharing for Black Ops III Zombies
 
     by Xep
 
@@ -3546,7 +3546,7 @@ zshare__zs_text( key, a, b )
 zshare__zs_version()
 {
     // ZS_VERSION_BEGIN
-    return "1.4";
+    return "1.5";
     // ZS_VERSION_END
 }
 
